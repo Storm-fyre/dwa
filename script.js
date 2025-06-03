@@ -78,57 +78,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // File Modal Logic (for PDF or image)
-    const fileModal = document.getElementById('fileModal');
-    const pdfViewer = document.getElementById('filePdfViewer');
-    const imgViewer = document.getElementById('fileImageViewer');
-    const fileClose = document.querySelector('.pdf-close');
-
-    function closeFileModal() {
-        fileModal.style.display = 'none';
-        pdfViewer.style.display = 'none';
-        pdfViewer.src = '';
-        imgViewer.style.display = 'none';
-        imgViewer.src = '';
-        document.body.style.overflow = 'auto'; // Restore scrolling
-    }
-
-    if (fileClose) {
-        fileClose.addEventListener('click', function() {
-            closeFileModal();
-        });
-    }
-
-    // Close modal when clicking outside
-    window.addEventListener('click', function(event) {
-        if (event.target === fileModal) {
-            closeFileModal();
-        }
-    });
-
-    // Helper to open either PDF (in iframe) or image (in <img>) in the modal
-    function openFileInModal(filePath, type) {
-        // If on mobile (< 768px), open in a new tab/window instead
-        if (window.innerWidth < 768) {
-            window.open(filePath, '_blank');
-            return;
-        }
-
-        // Desktop: display modal
-        if (type === 'pdf') {
-            pdfViewer.src = filePath + '#toolbar=1&navpanes=1&scrollbar=1';
-            pdfViewer.style.display = 'block';
-            imgViewer.style.display = 'none';
-        } else {
-            imgViewer.src = filePath;
-            imgViewer.style.display = 'block';
-            pdfViewer.style.display = 'none';
-        }
-
-        fileModal.style.display = 'block';
-        document.body.style.overflow = 'hidden'; // Prevent background scrolling
-    }
-
     // Load Leaders from JSON
     loadLeaders();
 
@@ -235,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Load Events from JSON
+    // Load Events from JSON (now displays heading → image (if any) → description)
     loadEvents();
 
     async function loadEvents() {
@@ -253,9 +202,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.events && data.events.length > 0) {
                 eventsContainer.innerHTML = ''; // Clear existing content
                 
-                data.events.forEach(event => {
-                    createEventItem(event, eventsContainer);
-                });
+                // Use a for...of loop so we can await each createEventItem
+                for (const event of data.events) {
+                    await createEventItem(event, eventsContainer);
+                }
             } else {
                 eventsContainer.innerHTML = '<p>No events available at the moment.</p>';
             }
@@ -265,64 +215,90 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function createEventItem(event, container) {
+    // Create a single event block with: [Heading] → [Image if exists] → [Description]
+    async function createEventItem(event, container) {
         const eventDiv = document.createElement('div');
         eventDiv.className = 'event-item';
-        
-        let eventHTML = `
-            <h3>${event.title}</h3>
-            <p>${event.description}</p>
-        `;
-        
-        // Add "More Details" button if enabled
-        if (event.hasMoreDetails) {
-            eventHTML += `
-                <button class="event-more-details-btn" data-event-id="${event.id}">More Details</button>
-            `;
-        }
-        
-        eventDiv.innerHTML = eventHTML;
-        
-        // If "More Details" is enabled, set up click handler
-        if (event.hasMoreDetails) {
-            const moreDetailsBtn = eventDiv.querySelector('.event-more-details-btn');
-            moreDetailsBtn.addEventListener('click', function() {
-                const eventId = this.getAttribute('data-event-id');
-                attemptToOpenFile(eventId);
-            });
-        }
-        
-        container.appendChild(eventDiv);
-    }
 
-    async function attemptToOpenFile(eventId) {
-        // Try in this order: pdf → jpg → jpeg → png
-        const extensions = ['pdf', 'jpg', 'jpeg', 'png'];
+        // 1) Title (Heading) first
+        const titleEl = document.createElement('h3');
+        titleEl.textContent = event.title;
+        eventDiv.appendChild(titleEl);
+
+        // 2) Attempt to find an image for this event (check .jpg, .jpeg, .png)
+        const extensions = ['jpg', 'jpeg', 'png'];
         for (let ext of extensions) {
-            const filePath = `Our Events/${eventId}.${ext}`;
+            const filePath = `Our Events/${event.id}.${ext}`;
             try {
-                // Use HEAD to check if the file exists
+                // Use a HEAD request to check existence
                 const response = await fetch(filePath, { method: 'HEAD' });
                 if (response.ok) {
-                    // Found the file; open in modal
-                    if (ext === 'pdf') {
-                        openFileInModal(filePath, 'pdf');
-                    } else {
-                        openFileInModal(filePath, 'image');
-                    }
-                    return;
+                    // Found an image → Insert it after the heading
+                    const img = document.createElement('img');
+                    img.src = filePath;
+                    img.alt = event.title;
+                    img.style.width = '100%';
+                    img.style.height = 'auto';
+                    img.style.marginBottom = '10px';
+
+                    // Insert img directly after the <h3>
+                    eventDiv.appendChild(img);
+                    break; // Stop checking other extensions once found
                 }
             } catch (err) {
-                // If fetch itself fails (network error), skip to next extension
+                // If HEAD request fails, move on to next extension
                 console.warn(`Could not find ${filePath}`, err);
                 continue;
             }
         }
-        // If no matching file found, alert the user
-        alert('No details file found for this event.');
+
+        // 3) Description (always last)
+        const descEl = document.createElement('p');
+        descEl.textContent = event.description;
+        eventDiv.appendChild(descEl);
+
+        // Finally, append this complete block to the container
+        container.appendChild(eventDiv);
     }
 
-    // Load Contributors from JSON
+    // Load Members from members.json
+    loadMembers();
+
+    async function loadMembers() {
+        const membersContainer = document.getElementById('membersContainer');
+        if (!membersContainer) return;
+
+        try {
+            const response = await fetch('members.json');
+            if (!response.ok) {
+                throw new Error('Failed to load members data');
+            }
+            
+            const data = await response.json();
+            
+            if (data.members && data.members.length > 0) {
+                membersContainer.innerHTML = ''; // Clear existing content
+
+                data.members.forEach(name => {
+                    createMemberItem(name, membersContainer);
+                });
+            } else {
+                membersContainer.innerHTML = '<p>No members available at the moment.</p>';
+            }
+        } catch (error) {
+            console.error('Error loading members:', error);
+            membersContainer.innerHTML = '<p>Unable to load members. Please try again later.</p>';
+        }
+    }
+
+    function createMemberItem(name, container) {
+        const memberDiv = document.createElement('div');
+        memberDiv.className = 'contributor-entry';
+        memberDiv.innerHTML = `<p>${name}</p>`;
+        container.appendChild(memberDiv);
+    }
+
+    // Load Contributors from contributors.json (names + amounts)
     loadContributors();
 
     async function loadContributors() {
@@ -336,70 +312,76 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             const data = await response.json();
-            
+
             if (data.contributors && Object.keys(data.contributors).length > 0) {
                 contributorsContainer.innerHTML = ''; // Clear existing content
 
-                // Convert to array of [name, amount]
-                const entries = Object.entries(data.contributors);
-
-                // Extract all amounts, get unique and sort descending
-                const amounts = entries.map(e => e[1]);
-                const uniqueAmounts = Array.from(new Set(amounts)).sort((a, b) => b - a);
-                const topAmounts = uniqueAmounts.slice(0, 3); // top 3 levels
-
-                // Filter top contributors (anyone whose amount is in topAmounts)
-                const topContributors = entries
-                    .filter(([name, amount]) => topAmounts.includes(amount))
-                    .sort((a, b) => b[1] - a[1]); // sort descending by amount
-
-                const topNamesSet = new Set(topContributors.map(([name]) => name));
-
-                // Create a container with a red border for top contributors
-                const topContainer = document.createElement('div');
-                topContainer.className = 'top-contributors';
-
-                // Optional heading inside that border
-                const topHeading = document.createElement('h3');
-                topHeading.textContent = 'Top Contributors';
-                topContainer.appendChild(topHeading);
-
-                // List each top contributor with name and contribution
-                topContributors.forEach(([name, amount]) => {
-                    const entryDiv = document.createElement('div');
-                    entryDiv.className = 'top-contributor-entry';
-                    entryDiv.innerHTML = `
-                        <p>${name}<span class="top-contributor-amount">— ₹${amount}</span></p>
-                    `;
-                    topContainer.appendChild(entryDiv);
-                });
-
-                // Append the bordered “Top Contributors” block first
-                contributorsContainer.appendChild(topContainer);
-
-                // Now append the remaining contributors (in the original JSON order), skipping those already shown
-                entries.forEach(([name, amount]) => {
-                    if (!topNamesSet.has(name)) {
-                        createContributorItem({ name, amount }, contributorsContainer);
-                    }
+                Object.entries(data.contributors).forEach(([name, amount]) => {
+                    createContributionItem({ name, amount }, contributorsContainer);
                 });
             } else {
-                contributorsContainer.innerHTML = '<p>No contributors available at the moment.</p>';
+                contributorsContainer.innerHTML = '<p>No contributions available at the moment.</p>';
             }
         } catch (error) {
             console.error('Error loading contributors:', error);
-            contributorsContainer.innerHTML = '<p>Unable to load contributors. Please try again later.</p>';
+            contributorsContainer.innerHTML = '<p>Unable to load contributions. Please try again later.</p>';
         }
     }
 
-    function createContributorItem(contributor, container) {
-        const contributorDiv = document.createElement('div');
-        contributorDiv.className = 'contributor-entry';
-        contributorDiv.innerHTML = `<p>${contributor.name}</p>`;
-        container.appendChild(contributorDiv);
+    function createContributionItem(contributor, container) {
+        const div = document.createElement('div');
+        div.className = 'contributor-entry';
+        div.innerHTML = `<p>${contributor.name}<span class="contributor-amount">— ₹${contributor.amount}</span></p>`;
+        container.appendChild(div);
     }
 
-    // Expose openFileInModal in case of external calls
+    // We leave the modal code in place, but since no "More Details" button is ever rendered, it won't be triggered.
+    const fileModal = document.getElementById('fileModal');
+    const pdfViewer = document.getElementById('filePdfViewer');
+    const imgViewer = document.getElementById('fileImageViewer');
+    const fileClose = document.querySelector('.pdf-close');
+
+    function closeFileModal() {
+        fileModal.style.display = 'none';
+        pdfViewer.style.display = 'none';
+        pdfViewer.src = '';
+        imgViewer.style.display = 'none';
+        imgViewer.src = '';
+        document.body.style.overflow = 'auto'; // Restore scrolling
+    }
+
+    if (fileClose) {
+        fileClose.addEventListener('click', function() {
+            closeFileModal();
+        });
+    }
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === fileModal) {
+            closeFileModal();
+        }
+    });
+
+    // Dummy stub (unused now) for compatibility
+    function openFileInModal(filePath, type) {
+        if (window.innerWidth < 768) {
+            window.open(filePath, '_blank');
+            return;
+        }
+        if (type === 'pdf') {
+            pdfViewer.src = filePath + '#toolbar=1&navpanes=1&scrollbar=1';
+            pdfViewer.style.display = 'block';
+            imgViewer.style.display = 'none';
+        } else {
+            imgViewer.src = filePath;
+            imgViewer.style.display = 'block';
+            pdfViewer.style.display = 'none';
+        }
+        fileModal.style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
     window.openFileInModal = openFileInModal;
     window.closeFileModal = closeFileModal;
 });

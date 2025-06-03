@@ -64,7 +64,7 @@ a:hover {
     margin: 0;
     font-size: 1.7em;
     color: #333;
-    font-family: Georgia, serif;
+    Font-family: Georgia, serif;
     text-transform: uppercase;
 }
 
@@ -75,7 +75,7 @@ a:hover {
     font-style: italic;
 }
 
-/* —— Desktop Top Navigation (3 links) —— */
+/* —— Desktop Top Navigation (4 links) —— */
 .desktop-navigation {
     display: none;           /* shown via media query */
     background-color: #333;
@@ -210,21 +210,11 @@ a:hover {
     line-height: 1.5;
 }
 
-.event-more-details-btn {
-    display: inline-block;
-    background-color: #27ae60;
-    color: white;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background-color 0.3s ease;
-}
-
-.event-more-details-btn:hover {
-    background-color: #219a52;
+/* Inline Event-Image Styling */
+.event-item img {
+    width: 100%;
+    height: auto;
+    margin-bottom: 10px;
 }
 
 /* ================= ADJUSTED “FILE MODAL” STYLES ================= */
@@ -308,11 +298,12 @@ a:hover {
 
 /* ================= END OF ADJUSTED “FILE MODAL” STYLES ================= */
 
-/* Contributors Styling */
+/* Contributors & Members Styling */
 .contributors-list {
     margin-top: 20px;
 }
 
+/* Each entry uses the same “contributor-entry” style (blue left border) */
 .contributor-entry {
     margin-bottom: 15px;
     padding: 10px;
@@ -327,29 +318,19 @@ a:hover {
     color: #333;
 }
 
-/* Top Contributors Styles */
-.top-contributors {
-    border: 2px solid red;
-    padding: 10px;
-    margin-bottom: 20px;
-    background-color: #fff5f5;
-}
-
-.top-contributor-entry {
-    margin-bottom: 10px;
-}
-
-.top-contributor-entry p {
-    margin: 0;
-    font-weight: bold;
-    color: #333;
-}
-
-.top-contributor-amount {
+/* Style for “— ₹amount” text under Contributions in June */
+.contributor-amount {
     font-style: italic;
     font-size: 0.9em;
     color: #555;
     margin-left: 5px;
+}
+
+/* Red border for the “Contributions in June” container */
+.red-border {
+    border: 2px solid red;
+    padding: 10px;
+    border-radius: 4px;
 }
 
 /* Footer (Contribute Here) */
@@ -392,6 +373,37 @@ a:hover {
     text-align: left;
 }
 
+/* Updated UPI button styles */
+.upi-button {
+    display: block;
+    width: 90%;
+    max-width: 300px;
+    margin: 10px auto 0 auto;
+    padding: 15px 0;
+    background-color: #27ae60;
+    color: white !important;
+    text-decoration: none;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.upi-button:hover {
+    background-color: #219a52;
+}
+
+/* Style for clickable QR code wrapper */
+.upi-qr-link {
+    display: block;
+}
+
+.upi-qr-link img {
+    display: block;
+    margin: 10px auto 0 auto;
+    cursor: pointer;
+}
+
 .upi-transfer-method {
     text-align: center;
 }
@@ -424,7 +436,7 @@ a:hover {
     margin-bottom: 20px;
 }
 
-.copyright {
+copyright {
     font-size: 0.9em;
     margin-top: 20px;
 }

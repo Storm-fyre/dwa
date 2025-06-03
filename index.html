@@ -19,10 +19,11 @@
             </p>
         </header>
 
-        <!-- II. Desktop-Only Top Menu (3 links, left-aligned) -->
+        <!-- II. Desktop-Only Top Menu (4 links, left-aligned) -->
         <nav class="desktop-navigation">
             <ul>
                 <li><a href="#events" class="nav-link">Our Events</a></li>
+                <li><a href="#members" class="nav-link">Our Members</a></li>
                 <li><a href="#contributors" class="nav-link">Our Contributors</a></li>
                 <li><a href="#contribute" class="nav-link">Contribute Here</a></li>
             </ul>
@@ -73,9 +74,8 @@
             <nav class="mobile-navigation">
                 <ul>
                     <li><a href="#events" class="nav-link">Our Events</a></li>
-                    <li>
-                        <a href="#contributors" class="nav-link">Our Contributors</a>
-                    </li>
+                    <li><a href="#members" class="nav-link">Our Members</a></li>
+                    <li><a href="#contributors" class="nav-link">Our Contributors</a></li>
                     <li><a href="#contribute" class="nav-link">Contribute Here</a></li>
                 </ul>
             </nav>
@@ -111,11 +111,20 @@
                     </div>
                 </section>
 
+                <section id="members" class="content-section">
+                    <!-- OUR VALUED MEMBERS -->
+                    <h2 style="text-transform: uppercase;">OUR VALUED MEMBERS</h2>
+                    <div class="contributors-list" id="membersContainer">
+                        <!-- Populated dynamically via script.js -->
+                    </div>
+                </section>
+
                 <section id="contributors" class="content-section">
-                    <h2 style="text-transform: uppercase;">
-                        OUR VALUED CONTRIBUTORS
+                    <!-- CONTRIBUTIONS IN JUNE (red border around this block) -->
+                    <h2 style="text-transform: uppercase; margin-top: 20px;">
+                        CONTRIBUTIONS IN JUNE
                     </h2>
-                    <div class="contributors-list" id="contributorsContainer">
+                    <div class="contributors-list red-border" id="contributorsContainer">
                         <!-- Populated dynamically via script.js -->
                     </div>
                 </section>
@@ -133,14 +142,13 @@
                         <strong>DIRECT LINK TRANSFER (only for Mobiles)</strong>
                     </h3>
                     <div class="direct-link">
-                        <p>
-                            Pay directly by tapping this link:
-                            <a
-                                href="upi://pay?pa=dhanvantariwelfareassociation@icici&amp;cu=INR"
-                                target="_blank"
-                                >UPI Payment Link</a
-                            >
-                        </p>
+                        <p>Pay directly by tapping this button:</p>
+                        <a
+                            href="upi://pay?pa=dhanvantariwelfareassociation@icici&amp;cu=INR"
+                            target="_blank"
+                            class="upi-button"
+                            >UPI Payment Link</a
+                        >
                     </div>
                 </div>
 
@@ -157,11 +165,17 @@
                         </div>
                         <div class="upi-scanner">
                             <p><strong>Scan UPI QR Code:</strong></p>
-                            <img
-                                src="images/upi_qr_code.png"
-                                alt="UPI QR Code"
-                                width="150"
-                            />
+                            <a
+                                href="upi://pay?pa=dhanvantariwelfareassociation@icici&amp;cu=INR"
+                                target="_blank"
+                                class="upi-qr-link"
+                            >
+                                <img
+                                    src="images/upi_qr_code.png"
+                                    alt="UPI QR Code"
+                                    width="150"
+                                />
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -226,7 +240,6 @@
         </div>
     </div>
 
-    <!-- script.js remains unchanged except for contributor logic -->
     <script src="script.js"></script>
 </body>
 </html>
