@@ -1,0 +1,29 @@
+{
+  "directors": {
+    "V Rama Krishna": ["President", "9848435566"],
+    "R A Narasimha Rao": ["Vice President", "9908083799"],
+    "P Ratna Kumar": ["Secretary", "9866685051"],
+    "Y Leela Krishna": ["Joint Secretary", "8328296279"],
+    "M P Swami": ["Treasurer", "9133793399"],
+    "Ch Ravi Srinivas": ["Committee Member", "9849797360"],
+    "T Venkata Narayana": ["Committee Member", "8885675574"]
+  },
+  "executive_members": {
+    "K.V.S. Ramesh": "7799716873",
+    "M. Srihari": "8978554104",
+    "D. Suresh Kumar": "9840946503",
+    "Poduri Srinivas": "9705347822",
+    "S. Rambabu": "9959971679",
+    "P. Muralidhar": "7981266132",
+    "M. Murali Krishna": "9059585968",
+    "B. V. Krishna": "9848075796",
+    "R. Babu Rao": "9948732479",
+    "K. Srinivas": "9849461283",
+    "Narayana (Naru)": "9949038570",
+    "Y. Basaveshwara Rao": "7396978679",
+    "I. Narasimha Murthy": "9985128599",
+    "R. Sudarshan": "9441779688",
+    "V. Hanumantha Rao": "9440773013",
+    "K. Ramachandar": "9493133089"
+  }
+}

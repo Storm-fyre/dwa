@@ -1,0 +1,28 @@
+{
+  "events": [
+    {
+      "id": 1,
+      "title": "Free Health Camp 2024",
+      "description": "Comprehensive health checkup camp organized for underprivileged communities in rural areas. Services include blood pressure monitoring, diabetes screening, and general health consultation.",
+      "hasMoreDetails": true
+    },
+    {
+      "id": 2,
+      "title": "Medical Awareness Drive",
+      "description": "Educational program focused on preventive healthcare measures, nutrition awareness, and hygiene practices for school children and community members.",
+      "hasMoreDetails": false
+    },
+    {
+      "id": 3,
+      "title": "Dhanvantari Jayanti Celebration",
+      "description": "Annual celebration of Lord Dhanvantari's birth anniversary with special prayers, cultural programs, and distribution of ayurvedic medicines to devotees.",
+      "hasMoreDetails": true
+    },
+    {
+      "id": 4,
+      "title": "Community Vaccination Drive",
+      "description": "Organized vaccination camp in collaboration with local health authorities to ensure immunization coverage for children and adults in the community.",
+      "hasMoreDetails": false
+    }
+  ]
+}

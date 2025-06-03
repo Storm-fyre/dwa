@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dhanvantari Welfare Association</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <!-- Dhanvantari Background Hue -->
+    <div class="dhanvantari-background-hue"></div>
+
+    <div class="page-wrapper">
+        <!-- I. Main Header -->
+        <header class="main-header">
+            <h1>DHANVANTARI WELFARE ASSOCIATION</h1>
+            <p class="registration-number">
+                <strong>Regd No.: 365 of 2023<br />Hyderabad, Telangana</strong>
+            </p>
+        </header>
+
+        <!-- II. Desktop-Only Top Menu (3 links, left-aligned) -->
+        <nav class="desktop-navigation">
+            <ul>
+                <li><a href="#events" class="nav-link">Our Events</a></li>
+                <li><a href="#contributors" class="nav-link">Our Contributors</a></li>
+                <li><a href="#contribute" class="nav-link">Contribute Here</a></li>
+            </ul>
+        </nav>
+
+        <!-- III. Portrait Section (always visible) -->
+        <div class="portrait-section">
+            <img
+                src="images/lord_dhanvantari_bg.jpg"
+                alt="Lord Dhanvantari"
+                class="dhanvantari-portrait"
+            />
+        </div>
+
+        <!-- IV. Mobile-Only Button Bar & Leaders (unchanged) -->
+        <div class="mobile-button-bar">
+            <button id="menuButton" class="mobile-nav-button menu-btn">
+                Menu ☰
+            </button>
+        </div>
+
+        <div class="mobile-leaders-section">
+            <h2 class="directors-heading" style="text-transform: uppercase;">
+                DIRECTORS
+            </h2>
+            <div class="directors-section-mobile">
+                <!-- Populated dynamically via script.js -->
+            </div>
+
+            <button id="showExecButton" class="show-exec-button">
+                Show Executive Members
+            </button>
+
+            <div
+                id="executiveSection"
+                class="executive-members-section-mobile"
+                style="display: none;"
+            >
+                <h3 style="color: silver; text-transform: uppercase;">
+                    EXECUTIVE MEMBERS
+                </h3>
+                <!-- Populated dynamically via script.js -->
+            </div>
+        </div>
+
+        <div id="mobileMenuPanel" class="mobile-panel menu-panel">
+            <button class="close-panel-btn" data-target="mobileMenuPanel">X</button>
+            <nav class="mobile-navigation">
+                <ul>
+                    <li><a href="#events" class="nav-link">Our Events</a></li>
+                    <li>
+                        <a href="#contributors" class="nav-link">Our Contributors</a>
+                    </li>
+                    <li><a href="#contribute" class="nav-link">Contribute Here</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- V. Desktop/Laptop View Layout (≥1000px) -->
+        <div class="desktop-layout">
+            <!-- A. Left Sidebar (Desktop) -->
+            <aside class="left-sidebar">
+                <!-- 1. Directors Section (must appear first) -->
+                <section class="directors-section">
+                    <h2 style="color: #333; text-transform: uppercase;">
+                        DIRECTORS
+                    </h2>
+                    <!-- Populated dynamically via script.js -->
+                </section>
+
+                <!-- 2. Executive Members Section -->
+                <section class="executive-members-section">
+                    <h2 style="color: silver; text-transform: uppercase;">
+                        EXECUTIVE MEMBERS
+                    </h2>
+                    <!-- Populated dynamically via script.js -->
+                </section>
+            </aside>
+
+            <!-- B. Main Content (Desktop) -->
+            <main class="main-content-area">
+                <section id="events" class="content-section">
+                    <h2 style="text-transform: uppercase;">OUR EVENTS</h2>
+                    <div id="eventsContainer">
+                        <!-- Populated dynamically via script.js -->
+                    </div>
+                </section>
+
+                <section id="contributors" class="content-section">
+                    <h2 style="text-transform: uppercase;">
+                        OUR VALUED CONTRIBUTORS
+                    </h2>
+                    <div class="contributors-list" id="contributorsContainer">
+                        <!-- Populated dynamically via script.js -->
+                    </div>
+                </section>
+            </main>
+        </div>
+        <!-- /.desktop-layout -->
+
+        <!-- VI. Footer (Contribute Here) -->
+        <footer id="contribute" class="main-footer content-section">
+            <h2 style="text-transform: uppercase;">CONTRIBUTE HERE</h2>
+            <div class="contribution-details">
+                <!-- 1. Direct Link Transfer (only for Mobiles) -->
+                <div class="payment-method direct-link-method">
+                    <h3 style="color: white !important; text-transform: uppercase;">
+                        <strong>DIRECT LINK TRANSFER (only for Mobiles)</strong>
+                    </h3>
+                    <div class="direct-link">
+                        <p>
+                            Pay directly by tapping this link:
+                            <a
+                                href="upi://pay?pa=dhanvantariwelfareassociation@icici&amp;cu=INR"
+                                target="_blank"
+                                >UPI Payment Link</a
+                            >
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 2. UPI Transfer -->
+                <div class="payment-method upi-transfer-method">
+                    <h3 style="color: white !important; text-transform: uppercase;">
+                        <strong>UPI TRANSFER</strong>
+                    </h3>
+                    <div class="upi-transfer-content">
+                        <div class="upi-details">
+                            <p>
+                                Name: M/S.DHANVANTARI WELFARE ASSOCIATION
+                            </p>
+                        </div>
+                        <div class="upi-scanner">
+                            <p><strong>Scan UPI QR Code:</strong></p>
+                            <img
+                                src="images/upi_qr_code.png"
+                                alt="UPI QR Code"
+                                width="150"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Account Transfer -->
+                <div class="payment-method account-transfer-method">
+                    <h3 style="color: white !important; text-transform: uppercase;">
+                        <strong>ACCOUNT TRANSFER</strong>
+                    </h3>
+                    <div class="account-details">
+                        <p>Bank: ICICI Bank</p>
+                        <p>Acc No: 194201002313</p>
+                        <p>Acc Name: DHANVANTARI WELFARE ASSOCIATION</p>
+                        <p>IFSC Code: ICIC0001942</p>
+                        <p>Branch: RTC X Road Branch, Hyderabad</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New separator line and prompt above contact info -->
+            <hr class="contact-separator" />
+            <p class="contact-prompt">
+                For any suggestions or clarifications contact:
+            </p>
+
+            <div class="contact-info">
+                <p>
+                    Email:
+                    <a href="mailto:ramakrishnav124@gmail.com"
+                        >ramakrishnav124@gmail.com</a
+                    >
+                </p>
+                <p>
+                    Phone:
+                    <a href="tel:9848435566">9848435566</a>
+                </p>
+            </div>
+
+            <p class="copyright">
+                © <span id="currentYear"></span> Stormfyre Foundry. All Rights Reserved.
+            </p>
+        </footer>
+    </div>
+    <!-- /.page-wrapper -->
+
+    <!-- File Modal (unchanged) -->
+    <div id="fileModal" class="pdf-modal">
+        <div class="pdf-modal-content">
+            <span class="pdf-close">&times;</span>
+            <iframe
+                id="filePdfViewer"
+                src=""
+                frameborder="0"
+                style="display: none;"
+            ></iframe>
+            <img
+                id="fileImageViewer"
+                src=""
+                alt="Event Detail"
+                style="display: none; max-width: 100%; max-height: 100%;"
+            />
+        </div>
+    </div>
+
+    <!-- script.js remains unchanged except for contributor logic -->
+    <script src="script.js"></script>
+</body>
+</html>
