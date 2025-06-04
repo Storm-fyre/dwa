@@ -1,3 +1,4 @@
+/* style.css */
 /* Global Styles */
 body {
     font-family: Arial, sans-serif;
@@ -64,7 +65,7 @@ a:hover {
     margin: 0;
     font-size: 1.7em;
     color: #333;
-    Font-family: Georgia, serif;
+    font-family: Georgia, serif;
     text-transform: uppercase;
 }
 
@@ -350,14 +351,14 @@ a:hover {
     color: #7ddcff;
 }
 
-/* Contribution Details: three columns with vertical separators on desktop */
-/* Add horizontal separators between payment-methods in mobile view */
+/* Contribution Details: now two columns on desktop */
 .contribution-details {
     display: block;    /* default: stack on mobile */
     margin-bottom: 20px;
     text-align: left;
 }
 
+/* In mobile view, keep horizontal separators */
 .contribution-details .payment-method:not(:last-child) {
     border-bottom: 1px solid #ccc;
     padding-bottom: 10px;
@@ -367,41 +368,6 @@ a:hover {
 /* Individual Payment-Method Boxes */
 .payment-method {
     margin-bottom: 20px;
-}
-
-.direct-link-method {
-    text-align: left;
-}
-
-/* Updated UPI button styles */
-.upi-button {
-    display: block;
-    width: 90%;
-    max-width: 300px;
-    margin: 10px auto 0 auto;
-    padding: 15px 0;
-    background-color: #27ae60;
-    color: white !important;
-    text-decoration: none;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
-    text-align: center;
-}
-
-.upi-button:hover {
-    background-color: #219a52;
-}
-
-/* Style for clickable QR code wrapper */
-.upi-qr-link {
-    display: block;
-}
-
-.upi-qr-link img {
-    display: block;
-    margin: 10px auto 0 auto;
-    cursor: pointer;
 }
 
 .upi-transfer-method {
@@ -416,6 +382,13 @@ a:hover {
 /* Center only the h3 within account-transfer-method */
 .account-transfer-method h3 {
     text-align: center;
+}
+
+/* Updated UPI QR code styling (no more <a> wrapper) */
+.upi-scanner img {
+    display: block;
+    margin: 10px auto 0 auto;
+    cursor: default; /* no clickable behavior */
 }
 
 /* New styles for the contact separator and prompt */
@@ -575,30 +548,31 @@ copyright {
         margin-bottom: 0;
     }
 
-    /* Footer: three columns with vertical separators */
+    /* Footer: two columns with equal width */
     .contribution-details {
         display: flex;
         justify-content: space-between;
-        align-items: flex-start;
+        /* Make both columns match height */
+        align-items: stretch;
     }
 
-    /* All three children share equal width */
+    /* Both children share equal width */
     .contribution-details > .payment-method {
         flex: 1;
         padding: 0 15px;
     }
 
-    /* Vertical separators: put lines on left/right of middle column */
-    .contribution-details > .upi-transfer-method {
-        border-left: 1px solid #ccc;
+    /* Vertical partition between UPI and Account in Contribute Here */
+    .contribution-details > .payment-method:first-child {
         border-right: 1px solid #ccc;
     }
 
-    /* Adjust donation blocks on desktop */
-    .direct-link-method {
-        text-align: left;
+    /* Shift Account column content slightly to the right */
+    .account-transfer-method {
+        padding-left: 20px;
     }
 
+    /* Adjust UPI and Account blocks on desktop */
     .upi-transfer-method {
         text-align: center;
     }
