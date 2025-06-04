@@ -48,11 +48,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Close panels if user clicks outside of them
     document.addEventListener('click', function(event) {
-        if (mobileMenuPanel && mobileMenuPanel.classList.contains('active') &&
-            !mobileMenuPanel.contains(event.target) && event.target !== menuButton) {
+        if (
+            mobileMenuPanel &&
+            mobileMenuPanel.classList.contains('active') &&
+            !mobileMenuPanel.contains(event.target) &&
+            event.target !== menuButton
+        ) {
             let el = event.target;
             let isButtonChild = false;
-            while(el) {
+            while (el) {
                 if (el === menuButton) {
                     isButtonChild = true;
                     break;
@@ -63,18 +67,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Executive Members Toggle
+    // Executive Members & Advisors Toggle (Mobile)
     const showExecButton = document.getElementById('showExecButton');
     const executiveSection = document.getElementById('executiveSection');
+    const advisorsSection = document.getElementById('advisorsSection');
 
     if (showExecButton && executiveSection) {
         showExecButton.addEventListener('click', function() {
             if (executiveSection.style.display === 'none') {
+                // Show both Executive Members and Advisors
                 executiveSection.style.display = 'block';
-                showExecButton.textContent = 'Hide Executive Members';
+                if (advisorsSection) advisorsSection.style.display = 'block';
+                showExecButton.textContent = 'Hide Executive Members and Advisors';
             } else {
+                // Hide both
                 executiveSection.style.display = 'none';
-                showExecButton.textContent = 'Show Executive Members';
+                if (advisorsSection) advisorsSection.style.display = 'none';
+                showExecButton.textContent = 'Show Executive Members and Advisors';
             }
         });
     }
@@ -122,13 +131,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Mobile Executive Members Section
         const mobileExecutiveSection = document.querySelector('.executive-members-section-mobile');
         if (mobileExecutiveSection && data.executive_members) {
-            const executiveMembersContainer = mobileExecutiveSection.querySelector('div') || mobileExecutiveSection;
-            
             // Clear existing content except the heading
-            const heading = executiveMembersContainer.querySelector('h3');
-            executiveMembersContainer.innerHTML = '';
+            const heading = mobileExecutiveSection.querySelector('h3');
+            mobileExecutiveSection.innerHTML = '';
             if (heading) {
-                executiveMembersContainer.appendChild(heading);
+                mobileExecutiveSection.appendChild(heading);
             }
             
             Object.entries(data.executive_members).forEach(([name, phone]) => {
@@ -137,7 +144,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 leaderDiv.innerHTML = `
                     <p class="leader-name-phone">${name} | ${phone}</p>
                 `;
-                executiveMembersContainer.appendChild(leaderDiv);
+                mobileExecutiveSection.appendChild(leaderDiv);
+            });
+        }
+
+        // Mobile Advisors Section
+        const mobileAdvisorsSection = document.querySelector('.advisors-section-mobile');
+        if (mobileAdvisorsSection && data.advisors) {
+            // Clear existing content except the heading
+            const heading = mobileAdvisorsSection.querySelector('h3');
+            mobileAdvisorsSection.innerHTML = '';
+            if (heading) {
+                mobileAdvisorsSection.appendChild(heading);
+            }
+            
+            data.advisors.forEach(name => {
+                const leaderDiv = document.createElement('div');
+                leaderDiv.className = 'leader-entry';
+                leaderDiv.innerHTML = `
+                    <p class="leader-name-phone">${name}</p>
+                `;
+                mobileAdvisorsSection.appendChild(leaderDiv);
             });
         }
     }
@@ -181,6 +208,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p class="leader-name-phone">${name} | ${phone}</p>
                 `;
                 desktopExecutiveSection.appendChild(leaderDiv);
+            });
+        }
+
+        // Desktop Advisors Section
+        const desktopAdvisorsSection = document.querySelector('.left-sidebar .advisors-section');
+        if (desktopAdvisorsSection && data.advisors) {
+            // Clear existing content except the heading
+            const heading = desktopAdvisorsSection.querySelector('h2');
+            desktopAdvisorsSection.innerHTML = '';
+            if (heading) {
+                desktopAdvisorsSection.appendChild(heading);
+            }
+            
+            data.advisors.forEach(name => {
+                const leaderDiv = document.createElement('div');
+                leaderDiv.className = 'leader-entry';
+                leaderDiv.innerHTML = `
+                    <p class="leader-name-phone">${name}</p>
+                `;
+                desktopAdvisorsSection.appendChild(leaderDiv);
             });
         }
     }
