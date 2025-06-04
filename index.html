@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,7 +38,19 @@
             />
         </div>
 
-        <!-- IV. Mobile-Only Button Bar & Leaders (unchanged) -->
+        <!-- IV. Mobile-Only QR Donate (below portrait) -->
+        <div class="mobile-qr-donate">
+            <p style="text-align: center; margin: 10px 0;">
+                scan this QR code and donate to contribute to the welfare of our community:
+            </p>
+            <img
+                src="images/upi_qr_code.png"
+                alt="UPI QR Code"
+                class="mobile-donate-qr"
+            />
+        </div>
+
+        <!-- V. Mobile-Only Button Bar & Leaders -->
         <div class="mobile-button-bar">
             <button id="menuButton" class="mobile-nav-button menu-btn">
                 Menu ☰
@@ -55,7 +66,7 @@
             </div>
 
             <button id="showExecButton" class="show-exec-button">
-                Show Executive Members
+                Show Executive Members and Advisors
             </button>
 
             <div
@@ -65,6 +76,17 @@
             >
                 <h3 style="color: silver; text-transform: uppercase;">
                     EXECUTIVE MEMBERS
+                </h3>
+                <!-- Populated dynamically via script.js -->
+            </div>
+
+            <div
+                id="advisorsSection"
+                class="advisors-section-mobile"
+                style="display: none;"
+            >
+                <h3 style="color: silver; text-transform: uppercase;">
+                    ADVISORS
                 </h3>
                 <!-- Populated dynamically via script.js -->
             </div>
@@ -82,7 +104,7 @@
             </nav>
         </div>
 
-        <!-- V. Desktop/Laptop View Layout (≥1000px) -->
+        <!-- VI. Desktop/Laptop View Layout (≥1000px) -->
         <div class="desktop-layout">
             <!-- A. Left Sidebar (Desktop) -->
             <aside class="left-sidebar">
@@ -98,6 +120,14 @@
                 <section class="executive-members-section">
                     <h2 style="color: silver; text-transform: uppercase;">
                         EXECUTIVE MEMBERS
+                    </h2>
+                    <!-- Populated dynamically via script.js -->
+                </section>
+
+                <!-- 3. Advisors Section (new) -->
+                <section class="advisors-section">
+                    <h2 style="color: silver; text-transform: uppercase;">
+                        ADVISORS
                     </h2>
                     <!-- Populated dynamically via script.js -->
                 </section>
@@ -133,7 +163,7 @@
         </div>
         <!-- /.desktop-layout -->
 
-        <!-- VI. Footer (Contribute Here) -->
+        <!-- VII. Footer (Contribute Here) -->
         <footer id="contribute" class="main-footer content-section">
             <h2 style="text-transform: uppercase;">CONTRIBUTE HERE</h2>
             <div class="contribution-details">
@@ -144,9 +174,7 @@
                     </h3>
                     <div class="upi-transfer-content">
                         <div class="upi-details">
-                            <p>
-                                Name: M/S. DHANVANTARI WELFARE ASSOCIATION
-                            </p>
+                            <p>Name: M/S. DHANVANTARI WELFARE ASSOCIATION</p>
                         </div>
                         <div class="upi-scanner">
                             <p><strong>Scan UPI QR Code:</strong></p>
