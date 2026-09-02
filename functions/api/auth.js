@@ -1,7 +1,8 @@
 export async function onRequestPost(context) {
   try {
     const data = await context.request.json();
-    const ADMIN_PASSWORD = context.env.ADMIN_PASSWORD || "DwaAdmin2026";
+    // Updated to your preferred password!
+    const ADMIN_PASSWORD = context.env.ADMIN_PASSWORD || "Admin20k";
     const SECRET_TOKEN = "dwa_secure_admin_2026";
 
     if (data.password === ADMIN_PASSWORD) {
