@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const targetElement = document.getElementById(targetId);
                 if (targetElement) {
                     targetElement.scrollIntoView({ behavior: 'smooth' });
-                    // If on mobile and a menu panel is open, close it
                     closeAllMobilePanels();
                 }
             }
@@ -75,12 +74,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (showExecButton && executiveSection) {
         showExecButton.addEventListener('click', function() {
             if (executiveSection.style.display === 'none') {
-                // Show both Executive Members and Advisors
                 executiveSection.style.display = 'block';
                 if (advisorsSection) advisorsSection.style.display = 'block';
                 showExecButton.textContent = 'Hide Executive Members and Advisors';
             } else {
-                // Hide both
                 executiveSection.style.display = 'none';
                 if (advisorsSection) advisorsSection.style.display = 'none';
                 showExecButton.textContent = 'Show Executive Members and Advisors';
@@ -94,163 +91,109 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadLeaders() {
         try {
             const response = await fetch('leaders.json');
-            if (!response.ok) {
-                throw new Error('Failed to load leaders data');
-            }
-            
+            if (!response.ok) throw new Error('Failed to load leaders data');
             const data = await response.json();
             
-            // Populate mobile leaders section
             populateMobileLeaders(data);
-            
-            // Populate desktop leaders section
             populateDesktopLeaders(data);
-            
         } catch (error) {
             console.error('Error loading leaders:', error);
         }
     }
 
     function populateMobileLeaders(data) {
-        // Mobile Directors Section
         const mobileDirectorsSection = document.querySelector('.directors-section-mobile');
         if (mobileDirectorsSection && data.directors) {
             mobileDirectorsSection.innerHTML = '';
-            
             Object.entries(data.directors).forEach(([name, details]) => {
                 const leaderDiv = document.createElement('div');
                 leaderDiv.className = 'leader-entry';
-                leaderDiv.innerHTML = `
-                    <p class="leader-name-phone">${name} | ${details[1]}</p>
-                    <p class="leader-designation">${details[0]}</p>
-                `;
+                leaderDiv.innerHTML = `<p class="leader-name-phone">${name} | ${details[1]}</p><p class="leader-designation">${details[0]}</p>`;
                 mobileDirectorsSection.appendChild(leaderDiv);
             });
         }
 
-        // Mobile Executive Members Section
         const mobileExecutiveSection = document.querySelector('.executive-members-section-mobile');
         if (mobileExecutiveSection && data.executive_members) {
-            // Clear existing content except the heading
             const heading = mobileExecutiveSection.querySelector('h3');
             mobileExecutiveSection.innerHTML = '';
-            if (heading) {
-                mobileExecutiveSection.appendChild(heading);
-            }
-            
+            if (heading) mobileExecutiveSection.appendChild(heading);
             Object.entries(data.executive_members).forEach(([name, phone]) => {
                 const leaderDiv = document.createElement('div');
                 leaderDiv.className = 'leader-entry';
-                leaderDiv.innerHTML = `
-                    <p class="leader-name-phone">${name} | ${phone}</p>
-                `;
+                leaderDiv.innerHTML = `<p class="leader-name-phone">${name} | ${phone}</p>`;
                 mobileExecutiveSection.appendChild(leaderDiv);
             });
         }
 
-        // Mobile Advisors Section
         const mobileAdvisorsSection = document.querySelector('.advisors-section-mobile');
         if (mobileAdvisorsSection && data.advisors) {
-            // Clear existing content except the heading
             const heading = mobileAdvisorsSection.querySelector('h3');
             mobileAdvisorsSection.innerHTML = '';
-            if (heading) {
-                mobileAdvisorsSection.appendChild(heading);
-            }
-            
+            if (heading) mobileAdvisorsSection.appendChild(heading);
             data.advisors.forEach(name => {
                 const leaderDiv = document.createElement('div');
                 leaderDiv.className = 'leader-entry';
-                leaderDiv.innerHTML = `
-                    <p class="leader-name-phone">${name}</p>
-                `;
+                leaderDiv.innerHTML = `<p class="leader-name-phone">${name}</p>`;
                 mobileAdvisorsSection.appendChild(leaderDiv);
             });
         }
     }
 
     function populateDesktopLeaders(data) {
-        // Desktop Directors Section
         const desktopDirectorsSection = document.querySelector('.left-sidebar .directors-section');
         if (desktopDirectorsSection && data.directors) {
-            // Clear existing content except the heading
             const heading = desktopDirectorsSection.querySelector('h2');
             desktopDirectorsSection.innerHTML = '';
-            if (heading) {
-                desktopDirectorsSection.appendChild(heading);
-            }
-            
+            if (heading) desktopDirectorsSection.appendChild(heading);
             Object.entries(data.directors).forEach(([name, details]) => {
                 const leaderDiv = document.createElement('div');
                 leaderDiv.className = 'leader-entry';
-                leaderDiv.innerHTML = `
-                    <p class="leader-name-phone">${name} | ${details[1]}</p>
-                    <p class="leader-designation">${details[0]}</p>
-                `;
+                leaderDiv.innerHTML = `<p class="leader-name-phone">${name} | ${details[1]}</p><p class="leader-designation">${details[0]}</p>`;
                 desktopDirectorsSection.appendChild(leaderDiv);
             });
         }
 
-        // Desktop Executive Members Section
         const desktopExecutiveSection = document.querySelector('.left-sidebar .executive-members-section');
         if (desktopExecutiveSection && data.executive_members) {
-            // Clear existing content except the heading
             const heading = desktopExecutiveSection.querySelector('h2');
             desktopExecutiveSection.innerHTML = '';
-            if (heading) {
-                desktopExecutiveSection.appendChild(heading);
-            }
-            
+            if (heading) desktopExecutiveSection.appendChild(heading);
             Object.entries(data.executive_members).forEach(([name, phone]) => {
                 const leaderDiv = document.createElement('div');
                 leaderDiv.className = 'leader-entry';
-                leaderDiv.innerHTML = `
-                    <p class="leader-name-phone">${name} | ${phone}</p>
-                `;
+                leaderDiv.innerHTML = `<p class="leader-name-phone">${name} | ${phone}</p>`;
                 desktopExecutiveSection.appendChild(leaderDiv);
             });
         }
 
-        // Desktop Advisors Section
         const desktopAdvisorsSection = document.querySelector('.left-sidebar .advisors-section');
         if (desktopAdvisorsSection && data.advisors) {
-            // Clear existing content except the heading
             const heading = desktopAdvisorsSection.querySelector('h2');
             desktopAdvisorsSection.innerHTML = '';
-            if (heading) {
-                desktopAdvisorsSection.appendChild(heading);
-            }
-            
+            if (heading) desktopAdvisorsSection.appendChild(heading);
             data.advisors.forEach(name => {
                 const leaderDiv = document.createElement('div');
                 leaderDiv.className = 'leader-entry';
-                leaderDiv.innerHTML = `
-                    <p class="leader-name-phone">${name}</p>
-                `;
+                leaderDiv.innerHTML = `<p class="leader-name-phone">${name}</p>`;
                 desktopAdvisorsSection.appendChild(leaderDiv);
             });
         }
     }
 
-    // Load Events from JSON (now displays heading → image (if any) → description)
+    // Load Events from JSON
     loadEvents();
-
     async function loadEvents() {
         const eventsContainer = document.getElementById('eventsContainer');
         if (!eventsContainer) return;
 
         try {
             const response = await fetch('Our Events/edits.json');
-            if (!response.ok) {
-                throw new Error('Failed to load events data');
-            }
-            
+            if (!response.ok) throw new Error('Failed to load events data');
             const data = await response.json();
             
             if (data.events && data.events.length > 0) {
-                eventsContainer.innerHTML = ''; // Clear existing content
-                
-                // Use a for...of loop so we can await each createEventItem
+                eventsContainer.innerHTML = '';
                 for (const event of data.events) {
                     await createEventItem(event, eventsContainer);
                 }
@@ -263,90 +206,129 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Create a single event block with: [Heading] → [Image if exists] → [Description]
     async function createEventItem(event, container) {
         const eventDiv = document.createElement('div');
         eventDiv.className = 'event-item';
-
-        // 1) Title (Heading) first
         const titleEl = document.createElement('h3');
         titleEl.textContent = event.title;
         eventDiv.appendChild(titleEl);
 
-        // 2) Attempt to find an image for this event (check .jpg, .jpeg, .png)
         const extensions = ['jpg', 'jpeg', 'png'];
         for (let ext of extensions) {
             const filePath = `Our Events/${event.id}.${ext}`;
             try {
-                // Use a HEAD request to check existence
                 const response = await fetch(filePath, { method: 'HEAD' });
                 if (response.ok) {
-                    // Found an image → Insert it after the heading
                     const img = document.createElement('img');
                     img.src = filePath;
                     img.alt = event.title;
                     img.style.width = '100%';
                     img.style.height = 'auto';
                     img.style.marginBottom = '10px';
-
-                    // Insert img directly after the <h3>
                     eventDiv.appendChild(img);
-                    break; // Stop checking other extensions once found
+                    break; 
                 }
             } catch (err) {
-                // If HEAD request fails, move on to next extension
-                console.warn(`Could not find ${filePath}`, err);
                 continue;
             }
         }
 
-        // 3) Description (always last)
         const descEl = document.createElement('p');
         descEl.textContent = event.description;
         eventDiv.appendChild(descEl);
-
-        // Finally, append this complete block to the container
         container.appendChild(eventDiv);
     }
 
-    // Load Members from members.json
+    // =========================================================================
+    // NEW: Load Members with Search, Sort & Infinite Scroll Logic
+    // =========================================================================
+    let allMembers = [];
+    let filteredMembers = [];
+    let displayedCount = 0;
+    const CHUNK_SIZE = 50;
+    
+    const membersContainer = document.getElementById('membersContainer');
+    const memberSearch = document.getElementById('memberSearch');
+
     loadMembers();
 
     async function loadMembers() {
-        const membersContainer = document.getElementById('membersContainer');
         if (!membersContainer) return;
 
         try {
             const response = await fetch('members.json');
-            if (!response.ok) {
-                throw new Error('Failed to load members data');
-            }
+            if (!response.ok) throw new Error('Failed to load members data');
             
             const data = await response.json();
             
             if (data.members && data.members.length > 0) {
-                membersContainer.innerHTML = ''; // Clear existing content
+                // 1. Sort Alphabetically (Handles both English and Telugu)
+                allMembers = data.members.sort((a, b) => a.localeCompare(b, 'te')); 
+                filteredMembers = [...allMembers];
+                
+                // 2. Render first chunk of 50
+                renderMemberChunk(true);
 
-                data.members.forEach(name => {
-                    createMemberItem(name, membersContainer);
+                // 3. Infinite Scroll Event Listener
+                membersContainer.addEventListener('scroll', () => {
+                    // Check if user has scrolled near the bottom (within 10 pixels)
+                    if (membersContainer.scrollTop + membersContainer.clientHeight >= membersContainer.scrollHeight - 10) {
+                        if (displayedCount < filteredMembers.length) {
+                            renderMemberChunk(false); // Load next chunk
+                        }
+                    }
                 });
+
+                // 4. Live Search Event Listener
+                if (memberSearch) {
+                    memberSearch.addEventListener('input', (e) => {
+                        const query = e.target.value.toLowerCase().trim();
+                        // Filter the master list
+                        filteredMembers = allMembers.filter(name => name.toLowerCase().includes(query));
+                        // Re-render from the top
+                        renderMemberChunk(true);
+                    });
+                }
             } else {
-                membersContainer.innerHTML = '<p>No members available at the moment.</p>';
+                membersContainer.innerHTML = '<p style="padding: 10px;">No members available at the moment.</p>';
             }
         } catch (error) {
             console.error('Error loading members:', error);
-            membersContainer.innerHTML = '<p>Unable to load members. Please try again later.</p>';
+            membersContainer.innerHTML = '<p style="padding: 10px;">Unable to load members. Please try again later.</p>';
         }
     }
 
-    function createMemberItem(name, container) {
-        const memberDiv = document.createElement('div');
-        memberDiv.className = 'contributor-entry';
-        memberDiv.innerHTML = `<p>${name}</p>`;
-        container.appendChild(memberDiv);
-    }
+    // High Performance DOM rendering for chunks
+    function renderMemberChunk(reset = false) {
+        if (reset) {
+            membersContainer.innerHTML = '';
+            displayedCount = 0;
+            // Scroll back to top if they typed in the search bar
+            membersContainer.scrollTop = 0; 
+        }
 
-    // Load Contributors from contributors.json (names + amounts)
+        const chunk = filteredMembers.slice(displayedCount, displayedCount + CHUNK_SIZE);
+        
+        if (chunk.length === 0 && reset) {
+            membersContainer.innerHTML = '<p style="padding: 10px; color: #777;">No matching members found.</p>';
+            return;
+        }
+
+        // Using DocumentFragment stops the browser from redrawing 50 times
+        const fragment = document.createDocumentFragment();
+        chunk.forEach(name => {
+            const memberDiv = document.createElement('div');
+            memberDiv.className = 'contributor-entry';
+            memberDiv.innerHTML = `<p>${name}</p>`;
+            fragment.appendChild(memberDiv);
+        });
+
+        membersContainer.appendChild(fragment);
+        displayedCount += chunk.length;
+    }
+    // =========================================================================
+
+    // Load Contributors from contributors.json
     loadContributors();
 
     async function loadContributors() {
@@ -355,17 +337,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             const response = await fetch('contributors.json');
-            if (!response.ok) {
-                throw new Error('Failed to load contributors data');
-            }
-            
+            if (!response.ok) throw new Error('Failed to load contributors data');
             const data = await response.json();
 
             if (data.contributors && Object.keys(data.contributors).length > 0) {
-                contributorsContainer.innerHTML = ''; // Clear existing content
-
+                contributorsContainer.innerHTML = '';
                 Object.entries(data.contributors).forEach(([name, amount]) => {
-                    createContributionItem({ name, amount }, contributorsContainer);
+                    const div = document.createElement('div');
+                    div.className = 'contributor-entry';
+                    div.innerHTML = `<p>${name}<span class="contributor-amount">— ₹${amount}</span></p>`;
+                    contributorsContainer.appendChild(div);
                 });
             } else {
                 contributorsContainer.innerHTML = '<p>No contributions available at the moment.</p>';
@@ -376,14 +357,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function createContributionItem(contributor, container) {
-        const div = document.createElement('div');
-        div.className = 'contributor-entry';
-        div.innerHTML = `<p>${contributor.name}<span class="contributor-amount">— ₹${contributor.amount}</span></p>`;
-        container.appendChild(div);
-    }
-
-    // We leave the modal code in place, but since no "More Details" button is ever rendered, it won't be triggered.
+    // Modal behavior
     const fileModal = document.getElementById('fileModal');
     const pdfViewer = document.getElementById('filePdfViewer');
     const imgViewer = document.getElementById('fileImageViewer');
@@ -395,24 +369,20 @@ document.addEventListener('DOMContentLoaded', function() {
         pdfViewer.src = '';
         imgViewer.style.display = 'none';
         imgViewer.src = '';
-        document.body.style.overflow = 'auto'; // Restore scrolling
+        document.body.style.overflow = 'auto'; 
     }
 
     if (fileClose) {
-        fileClose.addEventListener('click', function() {
-            closeFileModal();
-        });
+        fileClose.addEventListener('click', closeFileModal);
     }
 
-    // Close modal when clicking outside
     window.addEventListener('click', function(event) {
         if (event.target === fileModal) {
             closeFileModal();
         }
     });
 
-    // Dummy stub (unused now) for compatibility
-    function openFileInModal(filePath, type) {
+    window.openFileInModal = function(filePath, type) {
         if (window.innerWidth < 768) {
             window.open(filePath, '_blank');
             return;
@@ -427,9 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
             pdfViewer.style.display = 'none';
         }
         fileModal.style.display = 'block';
-        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        document.body.style.overflow = 'hidden';
     }
-
-    window.openFileInModal = openFileInModal;
     window.closeFileModal = closeFileModal;
 });

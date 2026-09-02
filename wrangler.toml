@@ -1,0 +1,14 @@
+name = "dwa"
+compatibility_date = "2026-09-02"
+pages_build_output_dir = "."
+
+# Database Binding (Cloudflare D1)
+[[d1_databases]]
+binding = "DB"
+database_name = "dwa-db"
+database_id = "c96ed129-5592-4c9a-a9d5-b7dc25569576"
+
+# Image Storage Binding (Cloudflare R2)
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "dwa-events"

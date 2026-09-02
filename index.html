@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dhanvantari Welfare Association</title>
+    <title>Dhanvantari Welfare Trust</title>
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -13,23 +13,24 @@
     <div class="page-wrapper">
         <!-- I. Main Header -->
         <header class="main-header">
-            <h1>DHANVANTARI WELFARE ASSOCIATION</h1>
+            <h1 class="main-title">ధన్వంతరీ వెల్ఫేర్ ట్రస్ట్</h1>
+            <h2 class="sub-heading">(నాయీబ్రాహ్మణుల సంక్షేమ వేదిక)</h2>
             <p class="registration-number">
-                <strong>Regd No.: 365 of 2023<br />Hyderabad, Telangana</strong>
+                <strong>Regd No.: 365 of 2023<br />Madinaguda, Hyderabad, Telangana</strong>
             </p>
         </header>
 
-        <!-- II. Desktop-Only Top Menu (4 links, left-aligned) -->
+        <!-- II. Desktop-Only Top Menu -->
         <nav class="desktop-navigation">
             <ul>
                 <li><a href="#events" class="nav-link">Our Events</a></li>
-                <li><a href="#members" class="nav-link">Our Members</a></li>
+                <li><a href="#members" class="nav-link">Permanent Members</a></li>
                 <li><a href="#contributors" class="nav-link">Our Contributors</a></li>
                 <li><a href="#contribute" class="nav-link">Contribute Here</a></li>
             </ul>
         </nav>
 
-        <!-- III. Portrait Section (always visible) -->
+        <!-- III. Portrait Section -->
         <div class="portrait-section">
             <img
                 src="images/lord_dhanvantari_bg.jpg"
@@ -43,7 +44,42 @@
             <a href="https://matrimony.dhanvantariwelfaretrust.in" class="hero-btn">వివాహ పరిచయ వేదిక</a>
         </div>
 
-        <!-- IV. Mobile-Only QR Donate (below portrait) -->
+        <!-- NEW: About Trust Section (Welcome & Objectives) -->
+        <div class="about-trust-section">
+            <h3 class="trust-motto">"సేవే మార్గం – సంఘ సంక్షేమమే మన లక్ష్యం"</h3>
+            
+            <p class="trust-welcome">
+                గౌరవనీయులైన సంఘీయులకు, ఆత్మీయులకు నమస్కారం.🙏<br><br>
+                మన నాయీబ్రాహ్మణుల సంక్షేమం, విద్య, వైద్యం, సాంస్కృతిక మరియు ఆర్థికాభివృద్ధి లక్ష్యాలుగా మన ట్రస్ట్ నిరంతరం కృషి చేస్తోంది. సంఘాభివృద్ధిని కాంక్షించే సేవాతత్పరులందరూ ఈ మహా యజ్ఞంలో భాగస్వాములు కావాలని ప్రార్థన.
+            </p>
+
+            <h3 class="objectives-title">✨ మన ట్రస్ట్ ముఖ్య ఆశయాలు – సేవా కార్యక్రమాలు:</h3>
+            
+            <div class="objectives-grid">
+                <div class="objective-card">
+                    <strong>📚 విద్య & వైద్యం:</strong> పేద విద్యార్థులకు, రోగులకు ఆర్థిక సహాయం.
+                </div>
+                <div class="objective-card">
+                    <strong>🤝 సంఘ ఐక్యత:</strong> ధన్వంతరీ జయంతి, వనసమారాధనల నిర్వహణ.
+                </div>
+                <div class="objective-card">
+                    <strong>💍 ఉచిత వివాహ వేదిక:</strong> వివాహ పరిచయ వేదికల నిర్వహణ.
+                </div>
+                <div class="objective-card">
+                    <strong>🏡 గ్రామీణ వికాసం:</strong> పల్లెల్లోని విద్యార్థులకై ప్రత్యేక సహాయం.
+                </div>
+                <div class="objective-card">
+                    <strong>💻 ఉచిత సాఫ్ట్‌వేర్ శిక్షణ:</strong> పైథాన్, జావా, క్లౌడ్ కోర్సులలో శిక్షణ.
+                </div>
+                <div class="objective-card">
+                    <strong>🍲 అన్నదానం:</strong> ప్రముఖ పుణ్యక్షేత్రాలలోని సత్రాలలో అన్నదానం.
+                </div>
+            </div>
+
+            <p class="trust-cta">🤝 సభ్యత్వం పొందండి – భాగస్వామ్యులవ్వండి!</p>
+        </div>
+
+        <!-- IV. Mobile-Only QR Donate -->
         <div class="mobile-qr-donate">
             <p style="text-align: center; margin: 10px 0;">
                 scan this QR code and donate to contribute to the welfare of our community:
@@ -63,37 +99,18 @@
         </div>
 
         <div class="mobile-leaders-section">
-            <h2 class="directors-heading" style="text-transform: uppercase;">
-                DIRECTORS
-            </h2>
+            <h2 class="directors-heading" style="text-transform: uppercase;">DIRECTORS</h2>
             <div class="directors-section-mobile">
                 <!-- Populated dynamically via script.js -->
             </div>
-
             <button id="showExecButton" class="show-exec-button">
                 Show Executive Members and Advisors
             </button>
-
-            <div
-                id="executiveSection"
-                class="executive-members-section-mobile"
-                style="display: none;"
-            >
-                <h3 style="color: silver; text-transform: uppercase;">
-                    EXECUTIVE MEMBERS
-                </h3>
-                <!-- Populated dynamically via script.js -->
+            <div id="executiveSection" class="executive-members-section-mobile" style="display: none;">
+                <h3 style="color: silver; text-transform: uppercase;">EXECUTIVE MEMBERS</h3>
             </div>
-
-            <div
-                id="advisorsSection"
-                class="advisors-section-mobile"
-                style="display: none;"
-            >
-                <h3 style="color: silver; text-transform: uppercase;">
-                    ADVISORS
-                </h3>
-                <!-- Populated dynamically via script.js -->
+            <div id="advisorsSection" class="advisors-section-mobile" style="display: none;">
+                <h3 style="color: silver; text-transform: uppercase;">ADVISORS</h3>
             </div>
         </div>
 
@@ -102,39 +119,24 @@
             <nav class="mobile-navigation">
                 <ul>
                     <li><a href="#events" class="nav-link">Our Events</a></li>
-                    <li><a href="#members" class="nav-link">Our Members</a></li>
+                    <li><a href="#members" class="nav-link">Permanent Members</a></li>
                     <li><a href="#contributors" class="nav-link">Our Contributors</a></li>
                     <li><a href="#contribute" class="nav-link">Contribute Here</a></li>
                 </ul>
             </nav>
         </div>
 
-        <!-- VI. Desktop/Laptop View Layout (≥1000px) -->
+        <!-- VI. Desktop/Laptop View Layout -->
         <div class="desktop-layout">
-            <!-- A. Left Sidebar (Desktop) -->
             <aside class="left-sidebar">
-                <!-- 1. Directors Section (must appear first) -->
                 <section class="directors-section">
-                    <h2 style="color: #333; text-transform: uppercase;">
-                        DIRECTORS
-                    </h2>
-                    <!-- Populated dynamically via script.js -->
+                    <h2 style="color: #333; text-transform: uppercase;">DIRECTORS</h2>
                 </section>
-
-                <!-- 2. Executive Members Section -->
                 <section class="executive-members-section">
-                    <h2 style="color: silver; text-transform: uppercase;">
-                        EXECUTIVE MEMBERS
-                    </h2>
-                    <!-- Populated dynamically via script.js -->
+                    <h2 style="color: silver; text-transform: uppercase;">EXECUTIVE MEMBERS</h2>
                 </section>
-
-                <!-- 3. Advisors Section (new) -->
                 <section class="advisors-section">
-                    <h2 style="color: silver; text-transform: uppercase;">
-                        ADVISORS
-                    </h2>
-                    <!-- Populated dynamically via script.js -->
+                    <h2 style="color: silver; text-transform: uppercase;">ADVISORS</h2>
                 </section>
             </aside>
 
@@ -148,15 +150,22 @@
                 </section>
 
                 <section id="members" class="content-section">
-                    <!-- OUR VALUED MEMBERS -->
-                    <h2 style="text-transform: uppercase;">OUR VALUED MEMBERS</h2>
-                    <div class="contributors-list" id="membersContainer">
-                        <!-- Populated dynamically via script.js -->
+                    <!-- PERMANENT MEMBERS WITH SCROLL & SEARCH -->
+                    <h2 style="text-transform: uppercase; margin-bottom: 5px;">PERMANENT MEMBERS</h2>
+                    <p class="membership-fee"><em>(Entry Fee: ₹5,000 | Monthly Subscription: ₹100)</em></p>
+                    
+                    <div class="directory-wrapper">
+                        <!-- Sticky Search Bar -->
+                        <input type="text" id="memberSearch" placeholder="Search member by name..." class="member-search-input" />
+                        
+                        <!-- Fixed Height Scrollable Box -->
+                        <div class="contributors-list scrollable-directory" id="membersContainer">
+                            <!-- Populated dynamically via script.js -->
+                        </div>
                     </div>
                 </section>
 
                 <section id="contributors" class="content-section">
-                    <!-- CONTRIBUTIONS IN JUNE (red border around this block) -->
                     <h2 style="text-transform: uppercase; margin-top: 20px;">
                         CONTRIBUTIONS IN JUNE
                     </h2>
@@ -172,7 +181,6 @@
         <footer id="contribute" class="main-footer content-section">
             <h2 style="text-transform: uppercase;">CONTRIBUTE HERE</h2>
             <div class="contribution-details">
-                <!-- UPI Transfer -->
                 <div class="payment-method upi-transfer-method">
                     <h3 style="color: white !important; text-transform: uppercase;">
                         <strong>UPI TRANSFER</strong>
@@ -183,16 +191,11 @@
                         </div>
                         <div class="upi-scanner">
                             <p><strong>Scan UPI QR Code:</strong></p>
-                            <img
-                                src="images/upi_qr_code.png"
-                                alt="UPI QR Code"
-                                width="150"
-                            />
+                            <img src="images/upi_qr_code.png" alt="UPI QR Code" width="150" />
                         </div>
                     </div>
                 </div>
 
-                <!-- Account Transfer -->
                 <div class="payment-method account-transfer-method">
                     <h3 style="color: white !important; text-transform: uppercase;">
                         <strong>ACCOUNT TRANSFER</strong>
@@ -207,48 +210,24 @@
                 </div>
             </div>
 
-            <!-- New separator line and prompt above contact info -->
             <hr class="contact-separator" />
-            <p class="contact-prompt">
-                For any suggestions or clarifications contact:
-            </p>
-
+            <p class="contact-prompt">For any suggestions or clarifications contact:</p>
             <div class="contact-info">
-                <p>
-                    Email:
-                    <a href="mailto:ramakrishnav124@gmail.com"
-                        >ramakrishnav124@gmail.com</a
-                    >
-                </p>
-                <p>
-                    Phone:
-                    <a href="tel:9848435566">9848435566</a>
-                </p>
+                <p>Email: <a href="mailto:ramakrishnav124@gmail.com">ramakrishnav124@gmail.com</a></p>
+                <p>Phone: <a href="tel:9848435566">9848435566</a></p>
             </div>
-
             <p class="copyright">
                 © <span id="currentYear"></span> Stormfyre Foundry. All Rights Reserved.
             </p>
         </footer>
     </div>
-    <!-- /.page-wrapper -->
 
-    <!-- File Modal (unchanged) -->
+    <!-- File Modal -->
     <div id="fileModal" class="pdf-modal">
         <div class="pdf-modal-content">
             <span class="pdf-close">&times;</span>
-            <iframe
-                id="filePdfViewer"
-                src=""
-                frameborder="0"
-                style="display: none;"
-            ></iframe>
-            <img
-                id="fileImageViewer"
-                src=""
-                alt="Event Detail"
-                style="display: none; max-width: 100%; max-height: 100%;"
-            />
+            <iframe id="filePdfViewer" src="" frameborder="0" style="display: none;"></iframe>
+            <img id="fileImageViewer" src="" alt="Event Detail" style="display: none; max-width: 100%; max-height: 100%;" />
         </div>
     </div>
 
