@@ -95,13 +95,69 @@ window.addContributor = async function() {
     loadContributors();
 }
 
-// --- Events & Image Upload (Now Supports Multiple Images) ---
+// --- Events & Image Upload Staging Queue ---
+let newEventPhotos = [];
+
+document.getElementById('customUploadBtn').addEventListener('click', () => {
+    document.getElementById('new-event-image').click();
+});
+
+document.getElementById('new-event-image').addEventListener('change', (e) => {
+    const files = Array.from(e.target.files);
+    
+    files.forEach(file => {
+        new Compressor(file, {
+            quality: 0.6,
+            maxWidth: 1920,
+            maxHeight: 1920,
+            mimeType: 'image/jpeg',
+            success(result) {
+                const compressedFile = new File([result], file.name.replace(/\.[^/.]+$/, "") + ".jpg", {
+                    type: 'image/jpeg',
+                });
+                newEventPhotos.push(compressedFile);
+                renderEventPhotoQueue();
+            },
+            error(err) {
+                alert("Error compressing image: " + err.message);
+            },
+        });
+    });
+    e.target.value = ''; 
+});
+
+function renderEventPhotoQueue() {
+    const queue = document.getElementById('photo_queue');
+    queue.innerHTML = '';
+    
+    newEventPhotos.forEach((file, i) => {
+        const item = document.createElement('div');
+        item.style.cssText = 'display: flex; align-items: center; justify-content: space-between; background: #f9f9f9; padding: 8px 12px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.9rem;';
+        
+        let displayName = file.name;
+        if (displayName.length > 25) displayName = displayName.substring(0, 25) + '...';
+
+        item.innerHTML = `
+            <div>
+                <span style="display:inline-block; width:30px; text-align:center; margin-right:10px;">🖼️</span>
+                <strong>${displayName}</strong> <span style="color: green; font-size: 0.8rem;">(Ready)</span>
+            </div>
+            <button type="button" onclick="removeNewEventPhoto(${i})" title="Remove photo" style="background: none; border: none; color: #e74c3c; font-size: 1.2rem; cursor: pointer; padding: 0 5px; font-weight: bold;">✖</button>
+        `;
+        queue.appendChild(item);
+    });
+}
+
+window.removeNewEventPhoto = function(index) {
+    newEventPhotos.splice(index, 1);
+    renderEventPhotoQueue();
+};
+
 async function loadEvents() {
     const res = await fetch('/api/events');
     const data = await res.json();
     const tbody = document.getElementById('events-list');
     tbody.innerHTML = data.map(e => {
-        // Extract the first image to use as thumbnail if there are multiple
         const firstImgUrl = e.image_url ? e.image_url.split(',')[0].trim() : '';
         return `
             <tr>
@@ -116,7 +172,6 @@ async function loadEvents() {
 window.addEvent = async function() {
     const title = document.getElementById('new-event-title').value;
     const desc = document.getElementById('new-event-desc').value;
-    const fileInput = document.getElementById('new-event-image');
     
     if(!title) return alert("Event title is required");
 
@@ -127,11 +182,10 @@ window.addEvent = async function() {
 
     let imageUrls = [];
     
-    // Upload files one by one to ensure compatibility with existing single-file backend endpoints
-    if (fileInput.files.length > 0) {
-        for (let i = 0; i < fileInput.files.length; i++) {
+    if (newEventPhotos.length > 0) {
+        for (let i = 0; i < newEventPhotos.length; i++) {
             const formData = new FormData();
-            formData.append('image', fileInput.files[i]);
+            formData.append('image', newEventPhotos[i]);
             
             try {
                 const uploadRes = await fetch('/api/upload', {
@@ -163,7 +217,8 @@ window.addEvent = async function() {
 
     document.getElementById('new-event-title').value = '';
     document.getElementById('new-event-desc').value = '';
-    fileInput.value = '';
+    newEventPhotos = [];
+    renderEventPhotoQueue();
     btn.disabled = false;
     status.style.display = 'none';
     loadEvents();

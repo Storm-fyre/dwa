@@ -123,11 +123,21 @@
             <div class="admin-form" style="flex-direction: column;">
                 <input type="text" id="new-event-title" placeholder="Event Title">
                 <textarea id="new-event-desc" placeholder="Event Description" rows="3"></textarea>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="file" id="new-event-image" accept="image/*" multiple style="flex: 1;">
-                    <button class="btn-add" id="btn-add-event" onclick="addEvent()">Add Event</button>
+                
+                <!-- NEW PHOTO UPLOAD QUEUE -->
+                <div style="width: 100%; border: 1px solid #ccc; padding: 15px; border-radius: 4px; background: #fff;">
+                    <label style="font-weight: bold; margin-bottom: 10px; display: block; color: #800000;">Upload Event Photo(s) (JPG/PNG)</label>
+                    
+                    <input type="file" id="new-event-image" accept=".jpg, .jpeg, .png" multiple style="display: none;">
+                    <button type="button" id="customUploadBtn" class="btn-clear" style="width: 100%; border: 2px dashed #800000; padding: 12px; font-size: 1rem; cursor: pointer; border-radius: 4px; background: #fdfdfd; font-weight: bold; color: #333;">📸 Tap here to choose photo(s)</button>
+                    
+                    <div id="photo_queue" style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;">
+                        <!-- Selected photos appear here -->
+                    </div>
                 </div>
-                <p id="event-upload-status" style="color: #3498db; margin: 0; display: none;">Uploading image(s), please wait...</p>
+
+                <button class="btn-add" id="btn-add-event" onclick="addEvent()" style="margin-top: 10px; width: 100%;">Add Event</button>
+                <p id="event-upload-status" style="color: #3498db; margin: 0; display: none; text-align: center; font-weight: bold; margin-top: 10px;">Uploading image(s), please wait...</p>
             </div>
             <table class="admin-table">
                 <thead><tr><th>Image</th><th>Title</th><th>Action</th></tr></thead>
@@ -146,6 +156,8 @@
         </div>
     </div>
 
+    <!-- Image Compression Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/compressorjs/1.2.1/compressor.min.js"></script>
     <script src="admin.js"></script>
 </body>
 </html>
