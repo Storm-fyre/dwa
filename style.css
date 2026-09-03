@@ -132,17 +132,20 @@ a:hover {
     margin: 10px 20px 25px 20px;
 }
 
+/* PERFECT LEGO FIT WRAPPER */
 .matrimony-card-wrapper {
     display: inline-flex;
     flex-direction: column;
-    align-items: stretch;
     width: 100%;
-    max-width: 330px;
+    max-width: 270px; /* Constrains exactly to previous button size for mobile */
+    margin: 0 auto;
     text-decoration: none;
     border-radius: 8px;
-    transition: transform 0.2s, box-shadow 0.2s;
+    border: 2px solid #D4AF37;
+    overflow: hidden; /* This masks the image perfectly into the rounded corners */
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    margin: 0 auto;
+    background-color: #800000;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .matrimony-card-wrapper:hover {
@@ -154,62 +157,40 @@ a:hover {
     width: 100%;
     height: auto;
     display: block;
-    border: 2px solid #D4AF37;
-    border-bottom: none;
-    border-radius: 8px 8px 0 0;
-    box-sizing: border-box;
-    background-color: #fff;
-}
-
-.hero-btn {
-    display: inline-block;
-    background-color: #800000; 
-    color: #D4AF37; 
-    font-size: 1.3em;
-    font-weight: bold;
-    text-decoration: none;
-    padding: 15px 30px;
-    border-radius: 8px;
-    border: 2px solid #D4AF37;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
-}
-
-.hero-btn:hover {
-    background-color: #D4AF37;
-    color: #800000;
-    transform: scale(1.05);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.4);
-    text-decoration: none;
-}
-
-/* Modifiers for the combined button */
-.matrimony-merged-btn {
-    display: block; 
-    border-radius: 0 0 8px 8px;
+    border: none;
     margin: 0;
-    box-sizing: border-box;
-    box-shadow: none; 
+    padding: 0;
 }
 
-/* Prevent double-scaling since wrapper scales */
-.matrimony-merged-btn:hover {
-    transform: none;
-    box-shadow: none; 
+.matrimony-btn-text {
+    background-color: #800000;
+    color: #D4AF37;
+    padding: 15px 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    column-gap: 8px;
+    row-gap: 4px;
+    text-align: center;
+    transition: background-color 0.2s, color 0.2s;
 }
 
-.matrimony-card-wrapper:hover .matrimony-merged-btn {
+.matrimony-card-wrapper:hover .matrimony-btn-text {
     background-color: #D4AF37;
     color: #800000;
 }
 
 .click-here-text {
-    font-size: 0.65em;
-    display: block;
-    margin-bottom: 2px;
+    font-size: 1.1em;
     font-weight: normal;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.telugu-text {
+    font-size: 1.3em;
+    font-weight: bold;
+    white-space: nowrap;
 }
 
 /* ================= ABOUT TRUST / OBJECTIVES SECTION ================= */
@@ -730,6 +711,10 @@ a:hover {
     
     .matrimony-hero-section {
         margin-top: 20px;
+    }
+
+    .matrimony-card-wrapper {
+        max-width: 380px; /* Allows the button text to fit on a single line */
     }
 
     .objectives-grid {
