@@ -95,19 +95,24 @@ window.addContributor = async function() {
     loadContributors();
 }
 
-// --- Events & Image Upload ---
+// --- Events & Image Upload (Now Supports Multiple Images) ---
 async function loadEvents() {
     const res = await fetch('/api/events');
     const data = await res.json();
     const tbody = document.getElementById('events-list');
-    tbody.innerHTML = data.map(e => `
-        <tr>
-            <td>${e.image_url ? `<img src="${e.image_url}" width="60" style="border-radius:4px;">` : 'No Image'}</td>
-            <td><strong>${e.title}</strong><br><small>${e.description}</small></td>
-            <td><button class="btn-delete" onclick="deleteItem('/api/events', ${e.id}, loadEvents)">Delete</button></td>
-        </tr>
-    `).join('');
+    tbody.innerHTML = data.map(e => {
+        // Extract the first image to use as thumbnail if there are multiple
+        const firstImgUrl = e.image_url ? e.image_url.split(',')[0].trim() : '';
+        return `
+            <tr>
+                <td>${firstImgUrl ? `<img src="${firstImgUrl}" width="60" style="border-radius:4px;">` : 'No Image'}</td>
+                <td><strong>${e.title}</strong><br><small>${e.description}</small></td>
+                <td><button class="btn-delete" onclick="deleteItem('/api/events', ${e.id}, loadEvents)">Delete</button></td>
+            </tr>
+        `;
+    }).join('');
 }
+
 window.addEvent = async function() {
     const title = document.getElementById('new-event-title').value;
     const desc = document.getElementById('new-event-desc').value;
@@ -120,28 +125,40 @@ window.addEvent = async function() {
     btn.disabled = true;
     status.style.display = 'block';
 
-    let imageUrl = '';
+    let imageUrls = [];
+    
+    // Upload files one by one to ensure compatibility with existing single-file backend endpoints
     if (fileInput.files.length > 0) {
-        const formData = new FormData();
-        formData.append('image', fileInput.files[0]);
-        try {
-            const uploadRes = await fetch('/api/upload', {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` },
-                body: formData
-            });
-            const uploadData = await uploadRes.json();
-            imageUrl = uploadData.url;
-        } catch (e) {
-            alert("Image upload failed!");
-            btn.disabled = false; status.style.display = 'none'; return;
+        for (let i = 0; i < fileInput.files.length; i++) {
+            const formData = new FormData();
+            formData.append('image', fileInput.files[i]);
+            
+            try {
+                const uploadRes = await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const uploadData = await uploadRes.json();
+                
+                if (uploadData.url) {
+                    imageUrls.push(uploadData.url);
+                }
+            } catch (e) {
+                alert(`Upload failed for image ${i + 1}.`);
+                btn.disabled = false; 
+                status.style.display = 'none'; 
+                return;
+            }
         }
     }
+    
+    const finalImageUrlString = imageUrls.join(', ');
 
     await fetch('/api/events', { 
         method: 'POST', 
         headers: headers(), 
-        body: JSON.stringify({ title, description: desc, image_url: imageUrl }) 
+        body: JSON.stringify({ title, description: desc, image_url: finalImageUrlString }) 
     });
 
     document.getElementById('new-event-title').value = '';

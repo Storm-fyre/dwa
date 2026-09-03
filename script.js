@@ -74,21 +74,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Executive Members & Advisors Toggle (Mobile)
+    // Executive Members Toggle (Mobile)
     const showExecButton = document.getElementById('showExecButton');
     const executiveSection = document.getElementById('executiveSection');
-    const advisorsSection = document.getElementById('advisorsSection');
 
     if (showExecButton && executiveSection) {
         showExecButton.addEventListener('click', function() {
             if (executiveSection.style.display === 'none') {
                 executiveSection.style.display = 'block';
-                if (advisorsSection) advisorsSection.style.display = 'block';
-                showExecButton.textContent = 'Hide Executive Members and Advisors';
+                showExecButton.textContent = 'Hide Executive Members';
             } else {
                 executiveSection.style.display = 'none';
-                if (advisorsSection) advisorsSection.style.display = 'none';
-                showExecButton.textContent = 'Show Executive Members and Advisors';
+                showExecButton.textContent = 'Show Executive Members';
             }
         });
     }
@@ -130,18 +127,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 mobileExecutiveSection.appendChild(leaderDiv);
             });
         }
-        const mobileAdvisorsSection = document.querySelector('.advisors-section-mobile');
-        if (mobileAdvisorsSection && data.advisors) {
-            const heading = mobileAdvisorsSection.querySelector('h3');
-            mobileAdvisorsSection.innerHTML = '';
-            if (heading) mobileAdvisorsSection.appendChild(heading);
-            data.advisors.forEach(name => {
-                const leaderDiv = document.createElement('div');
-                leaderDiv.className = 'leader-entry';
-                leaderDiv.innerHTML = `<p class="leader-name-phone">${name}</p>`;
-                mobileAdvisorsSection.appendChild(leaderDiv);
-            });
-        }
     }
 
     function populateDesktopLeaders(data) {
@@ -169,18 +154,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 desktopExecutiveSection.appendChild(leaderDiv);
             });
         }
-        const desktopAdvisorsSection = document.querySelector('.left-sidebar .advisors-section');
-        if (desktopAdvisorsSection && data.advisors) {
-            const heading = desktopAdvisorsSection.querySelector('h2');
-            desktopAdvisorsSection.innerHTML = '';
-            if (heading) desktopAdvisorsSection.appendChild(heading);
-            data.advisors.forEach(name => {
-                const leaderDiv = document.createElement('div');
-                leaderDiv.className = 'leader-entry';
-                leaderDiv.innerHTML = `<p class="leader-name-phone">${name}</p>`;
-                desktopAdvisorsSection.appendChild(leaderDiv);
-            });
-        }
     }
 
     // =========================================================
@@ -194,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!eventsContainer) return;
 
         try {
-            const response = await fetch('/api/events'); // <-- Updated to API
+            const response = await fetch('/api/events'); 
             if (!response.ok) throw new Error('Failed to load events data');
             const data = await response.json();
             
@@ -205,9 +178,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     eventDiv.className = 'event-item';
                     
                     let htmlContent = `<h3>${event.title}</h3>`;
+                    
                     if (event.image_url) {
-                        htmlContent += `<img src="${event.image_url}" alt="${event.title}" style="width: 100%; height: auto; margin-bottom: 10px;">`;
+                        const urls = event.image_url.split(',').map(u => u.trim()).filter(u => u);
+                        
+                        if (urls.length === 1) {
+                            htmlContent += `<img src="${urls[0]}" alt="${event.title}" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 4px;">`;
+                        } else if (urls.length > 1) {
+                            htmlContent += `<div class="event-gallery">`;
+                            urls.forEach(url => {
+                                htmlContent += `<img src="${url}" alt="${event.title}">`;
+                            });
+                            htmlContent += `</div>`;
+                        }
                     }
+                    
                     if (event.description) {
                         htmlContent += `<p>${event.description}</p>`;
                     }
@@ -236,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadMembers() {
         if (!membersContainer) return;
         try {
-            const response = await fetch('/api/members'); // <-- Updated to API
+            const response = await fetch('/api/members');
             if (!response.ok) throw new Error('Failed to load members data');
             const data = await response.json();
             
@@ -303,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!contributorsContainer) return;
 
         try {
-            const response = await fetch('/api/contributors'); // <-- Updated to API
+            const response = await fetch('/api/contributors'); 
             if (!response.ok) throw new Error('Failed to load contributors data');
             const data = await response.json();
 
@@ -327,7 +312,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadSettings();
     async function loadSettings() {
         try {
-            const response = await fetch('/api/settings'); // <-- Updated to API
+            const response = await fetch('/api/settings');
             if (response.ok) {
                 const data = await response.json();
                 const monthSetting = data.find(s => s.key === 'contribution_month');

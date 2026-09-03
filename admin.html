@@ -124,10 +124,10 @@
                 <input type="text" id="new-event-title" placeholder="Event Title">
                 <textarea id="new-event-desc" placeholder="Event Description" rows="3"></textarea>
                 <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="file" id="new-event-image" accept="image/*" style="flex: 1;">
+                    <input type="file" id="new-event-image" accept="image/*" multiple style="flex: 1;">
                     <button class="btn-add" id="btn-add-event" onclick="addEvent()">Add Event</button>
                 </div>
-                <p id="event-upload-status" style="color: #3498db; margin: 0; display: none;">Uploading image, please wait...</p>
+                <p id="event-upload-status" style="color: #3498db; margin: 0; display: none;">Uploading image(s), please wait...</p>
             </div>
             <table class="admin-table">
                 <thead><tr><th>Image</th><th>Title</th><th>Action</th></tr></thead>

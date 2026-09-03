@@ -137,12 +137,12 @@ a:hover {
     display: inline-flex;
     flex-direction: column;
     width: 100%;
-    max-width: 270px; /* Constrains exactly to previous button size for mobile */
+    max-width: 270px;
     margin: 0 auto;
     text-decoration: none;
     border-radius: 8px;
     border: 2px solid #D4AF37;
-    overflow: hidden; /* This masks the image perfectly into the rounded corners */
+    overflow: hidden; 
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     background-color: #800000;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -323,8 +323,7 @@ a:hover {
 }
 
 .directors-section,
-.executive-members-section,
-.advisors-section {
+.executive-members-section {
     margin-bottom: 30px;
 }
 
@@ -372,10 +371,38 @@ a:hover {
     line-height: 1.5;
 }
 
-.event-item img {
+/* Swipeable Gallery for Events with Multiple Photos */
+.event-gallery {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+}
+
+.event-gallery::-webkit-scrollbar {
+    height: 6px;
+}
+
+.event-gallery::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+}
+
+.event-gallery::-webkit-scrollbar-thumb {
+    background: #3498db;
+    border-radius: 4px;
+}
+
+.event-gallery img {
     width: 100%;
-    height: auto;
-    margin-bottom: 10px;
+    max-height: 450px;
+    object-fit: contain;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    border-radius: 4px;
+    margin-bottom: 0;
+    background-color: #fafafa;
 }
 
 /* ================= MEMBERS DIRECTORY (SCROLL & SEARCH) ================= */
@@ -714,7 +741,7 @@ a:hover {
     }
 
     .matrimony-card-wrapper {
-        max-width: 380px; /* Allows the button text to fit on a single line */
+        max-width: 380px; 
     }
 
     .objectives-grid {
