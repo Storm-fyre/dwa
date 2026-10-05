@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     
     // =========================================================
-    // NEW: TRIPLE-TAP SECRET ADMIN ACCESS
+    // TRIPLE-TAP SECRET ADMIN ACCESS
     // =========================================================
     let tapCount = 0;
     let tapTimer = null;
@@ -10,24 +10,29 @@ document.addEventListener('DOMContentLoaded', function() {
     if (secretTrigger) {
         secretTrigger.addEventListener('click', () => {
             tapCount++;
-            if (tapCount === 1) { tapTimer = setTimeout(() => { tapCount = 0; }, 1500); }
+            if (tapCount === 1) { 
+                tapTimer = setTimeout(() => { tapCount = 0; }, 1500); 
+            }
             if (tapCount === 3) {
                 clearTimeout(tapTimer);
                 tapCount = 0; 
-                window.location.href = "admin.html"; // Takes you to the secret portal
+                window.location.href = "admin.html";
             }
         });
     }
 
     // Set current year in footer
-    document.getElementById('currentYear').textContent = new Date().getFullYear();
+    const currentYearEl = document.getElementById('currentYear');
+    if (currentYearEl) {
+        currentYearEl.textContent = new Date().getFullYear();
+    }
 
     // Smooth scroll for navigation links
     const navLinks = document.querySelectorAll('a.nav-link, .desktop-navigation a');
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             const href = this.getAttribute('href');
-            if (href.startsWith('#')) {
+            if (href && href.startsWith('#')) {
                 e.preventDefault();
                 const targetId = href.substring(1);
                 const targetElement = document.getElementById(targetId);
@@ -91,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // =========================================================
-    // LOAD LEADERS (Remains static from local JSON - very fast)
+    // LOAD LEADERS (From local JSON)
     // =========================================================
     loadLeaders();
     async function loadLeaders() {
@@ -101,7 +106,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             populateMobileLeaders(data);
             populateDesktopLeaders(data);
-        } catch (error) { console.error('Error loading leaders:', error); }
+        } catch (error) { 
+            console.error('Error loading leaders:', error); 
+        }
     }
 
     function populateMobileLeaders(data) {
@@ -157,10 +164,101 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // =========================================================
-    // LIVE DATABASE API LOADS
+    // PERMANENT MEMBERS DIRECTORY (PHOTO + DUE LOGIC)
     // =========================================================
+    let allMembers = [];
+    let filteredMembers = [];
+    let displayedCount = 0;
+    const CHUNK_SIZE = 50;
     
-    // Load Events from Database API
+    const membersContainer = document.getElementById('membersContainer');
+    const memberSearch = document.getElementById('memberSearch');
+
+    loadMembers();
+    async function loadMembers() {
+        if (!membersContainer) return;
+        try {
+            const response = await fetch('/api/members');
+            if (!response.ok) throw new Error('Failed to load members data');
+            const data = await response.json();
+            
+            if (data && data.length > 0) {
+                // Sort with Telugu locale collation
+                allMembers = data.sort((a, b) => a.name.localeCompare(b.name, 'te')); 
+                filteredMembers = [...allMembers];
+                
+                renderMemberChunk(true);
+
+                membersContainer.addEventListener('scroll', () => {
+                    if (membersContainer.scrollTop + membersContainer.clientHeight >= membersContainer.scrollHeight - 20) {
+                        if (displayedCount < filteredMembers.length) {
+                            renderMemberChunk(false); 
+                        }
+                    }
+                });
+
+                if (memberSearch) {
+                    memberSearch.addEventListener('input', (e) => {
+                        const query = e.target.value.toLowerCase().trim();
+                        filteredMembers = allMembers.filter(m => m.name.toLowerCase().includes(query));
+                        renderMemberChunk(true);
+                    });
+                }
+            } else {
+                membersContainer.innerHTML = '<p style="padding: 15px; grid-column: 1/-1; text-align: center;">No members available at the moment.</p>';
+            }
+        } catch (error) {
+            membersContainer.innerHTML = '<p style="padding: 15px; grid-column: 1/-1; text-align: center;">Unable to load members.</p>';
+        }
+    }
+
+    function renderMemberChunk(reset = false) {
+        if (reset) {
+            membersContainer.innerHTML = '';
+            displayedCount = 0;
+            membersContainer.scrollTop = 0; 
+        }
+
+        const chunk = filteredMembers.slice(displayedCount, displayedCount + CHUNK_SIZE);
+        
+        if (chunk.length === 0 && reset) {
+            membersContainer.innerHTML = '<p style="padding: 15px; color: #777; grid-column: 1/-1; text-align: center;">No matching members found.</p>';
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        chunk.forEach(member => {
+            const card = document.createElement('div');
+            card.className = 'member-card';
+
+            // Member photo or clean fallback silhouette
+            const photoHtml = member.photo_url 
+                ? `<img src="${member.photo_url}" alt="${member.name}" class="member-avatar" loading="lazy">` 
+                : `<div class="member-avatar-placeholder">👤</div>`;
+
+            // Display "Due: ₹..." badge ONLY if pending balance exists; otherwise show nothing
+            const dueAmount = parseInt(member.due_amount, 10);
+            const dueBadgeHtml = (dueAmount && dueAmount > 0)
+                ? `<span class="member-due-badge">Due: ₹${dueAmount.toLocaleString('en-IN')}</span>`
+                : '';
+
+            card.innerHTML = `
+                ${photoHtml}
+                <div class="member-info">
+                    <p class="member-name">${member.name}</p>
+                    ${dueBadgeHtml}
+                </div>
+            `;
+            fragment.appendChild(card);
+        });
+
+        membersContainer.appendChild(fragment);
+        displayedCount += chunk.length;
+    }
+
+    // =========================================================
+    // LOAD EVENTS
+    // =========================================================
     loadEvents();
     async function loadEvents() {
         const eventsContainer = document.getElementById('eventsContainer');
@@ -208,80 +306,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Members Directory Logic (Connected to API)
-    let allMembers = [];
-    let filteredMembers = [];
-    let displayedCount = 0;
-    const CHUNK_SIZE = 50;
-    
-    const membersContainer = document.getElementById('membersContainer');
-    const memberSearch = document.getElementById('memberSearch');
-
-    loadMembers();
-    async function loadMembers() {
-        if (!membersContainer) return;
-        try {
-            const response = await fetch('/api/members');
-            if (!response.ok) throw new Error('Failed to load members data');
-            const data = await response.json();
-            
-            if (data && data.length > 0) {
-                // Map the array of DB objects into a clean array of strings, then sort
-                allMembers = data.map(m => m.name).sort((a, b) => a.localeCompare(b, 'te')); 
-                filteredMembers = [...allMembers];
-                
-                renderMemberChunk(true);
-
-                membersContainer.addEventListener('scroll', () => {
-                    if (membersContainer.scrollTop + membersContainer.clientHeight >= membersContainer.scrollHeight - 10) {
-                        if (displayedCount < filteredMembers.length) {
-                            renderMemberChunk(false); 
-                        }
-                    }
-                });
-
-                if (memberSearch) {
-                    memberSearch.addEventListener('input', (e) => {
-                        const query = e.target.value.toLowerCase().trim();
-                        filteredMembers = allMembers.filter(name => name.toLowerCase().includes(query));
-                        renderMemberChunk(true);
-                    });
-                }
-            } else {
-                membersContainer.innerHTML = '<p style="padding: 10px;">No members available at the moment.</p>';
-            }
-        } catch (error) {
-            membersContainer.innerHTML = '<p style="padding: 10px;">Unable to load members.</p>';
-        }
-    }
-
-    function renderMemberChunk(reset = false) {
-        if (reset) {
-            membersContainer.innerHTML = '';
-            displayedCount = 0;
-            membersContainer.scrollTop = 0; 
-        }
-
-        const chunk = filteredMembers.slice(displayedCount, displayedCount + CHUNK_SIZE);
-        
-        if (chunk.length === 0 && reset) {
-            membersContainer.innerHTML = '<p style="padding: 10px; color: #777;">No matching members found.</p>';
-            return;
-        }
-
-        const fragment = document.createDocumentFragment();
-        chunk.forEach(name => {
-            const memberDiv = document.createElement('div');
-            memberDiv.className = 'contributor-entry';
-            memberDiv.innerHTML = `<p>${name}</p>`;
-            fragment.appendChild(memberDiv);
-        });
-
-        membersContainer.appendChild(fragment);
-        displayedCount += chunk.length;
-    }
-
-    // Load Contributors from Database API
+    // =========================================================
+    // LOAD CONTRIBUTORS
+    // =========================================================
     loadContributors();
     async function loadContributors() {
         const contributorsContainer = document.getElementById('contributorsContainer');
@@ -308,7 +335,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Load Dynamic Month Settings from Database API
+    // =========================================================
+    // LOAD DYNAMIC CONTRIBUTION MONTH
+    // =========================================================
     loadSettings();
     async function loadSettings() {
         try {
@@ -323,21 +352,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
             }
-        } catch (error) { console.error('Error loading settings:', error); }
+        } catch (error) { 
+            console.error('Error loading settings:', error); 
+        }
     }
 
-    // Modal behavior (Retained for future generic use if needed)
+    // Modal behavior
     const fileModal = document.getElementById('fileModal');
     const pdfViewer = document.getElementById('filePdfViewer');
     const imgViewer = document.getElementById('fileImageViewer');
     const fileClose = document.querySelector('.pdf-close');
 
     function closeFileModal() {
+        if (!fileModal) return;
         fileModal.style.display = 'none';
-        pdfViewer.style.display = 'none';
-        pdfViewer.src = '';
-        imgViewer.style.display = 'none';
-        imgViewer.src = '';
+        if (pdfViewer) { pdfViewer.style.display = 'none'; pdfViewer.src = ''; }
+        if (imgViewer) { imgViewer.style.display = 'none'; imgViewer.src = ''; }
         document.body.style.overflow = 'auto'; 
     }
 
@@ -345,6 +375,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('click', function(event) { if (event.target === fileModal) closeFileModal(); });
 
     window.openFileInModal = function(filePath, type) {
+        if (!fileModal) return;
         if (window.innerWidth < 768) {
             window.open(filePath, '_blank');
             return;
@@ -360,6 +391,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         fileModal.style.display = 'block';
         document.body.style.overflow = 'hidden';
-    }
+    };
     window.closeFileModal = closeFileModal;
 });

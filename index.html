@@ -32,7 +32,7 @@
     <div class="page-wrapper">
         <!-- I. Main Header -->
         <header class="main-header">
-            <!-- TRIPLE-TAP TARGET ADDED HERE -->
+            <!-- TRIPLE-TAP TARGET -->
             <h1 id="secret-admin-trigger" class="main-title" style="cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;">ధన్వంతరీ వెల్ఫేర్ ట్రస్ట్</h1>
             <h2 class="sub-heading">(నాయీబ్రాహ్మణుల సంక్షేమ వేదిక)</h2>
             <p class="registration-number">
@@ -43,8 +43,8 @@
         <!-- II. Desktop-Only Top Menu -->
         <nav class="desktop-navigation">
             <ul>
-                <li><a href="#events" class="nav-link">Our Events</a></li>
                 <li><a href="#members" class="nav-link">Permanent Members</a></li>
+                <li><a href="#events" class="nav-link">Our Events</a></li>
                 <li><a href="#contributors" class="nav-link">Our Contributors</a></li>
                 <li><a href="#contribute" class="nav-link">Contribute Here</a></li>
             </ul>
@@ -69,6 +69,22 @@
                 </div>
             </a>
         </div>
+
+        <!-- PERMANENT MEMBERS SECTION (PLACED PROMINENTLY BETWEEN MATRIMONY & ABOUT SECTIONS) -->
+        <section id="members" class="content-section permanent-members-featured">
+            <h2 style="text-transform: uppercase; text-align: center; margin-bottom: 5px;">PERMANENT MEMBERS</h2>
+            <p class="membership-fee" style="text-align: center;"><em>(Entry Fee: ₹3,000 | Monthly Subscription: ₹100)</em></p>
+            
+            <div class="directory-wrapper">
+                <!-- Sticky Search Bar -->
+                <input type="text" id="memberSearch" placeholder="Search member by name..." class="member-search-input" />
+                
+                <!-- Scrollable Directory Grid Container -->
+                <div class="members-grid-scrollable" id="membersContainer">
+                    <!-- Populated dynamically via script.js -->
+                </div>
+            </div>
+        </section>
 
         <!-- About Trust Section (Welcome & Objectives) -->
         <div class="about-trust-section">
@@ -104,7 +120,7 @@
 
             <p class="trust-cta">
                 🤝 సభ్యత్వం పొందండి – భాగస్వామ్యులవ్వండి!<br><br>
-                సభ్యత్వ రుసుము: ₹5,000<br>
+                సభ్యత్వ రుసుము: ₹3,000<br>
                 నెలవారీ విరాళం: ₹100
             </p>
         </div>
@@ -145,8 +161,8 @@
             <button class="close-panel-btn" data-target="mobileMenuPanel">X</button>
             <nav class="mobile-navigation">
                 <ul>
-                    <li><a href="#events" class="nav-link">Our Events</a></li>
                     <li><a href="#members" class="nav-link">Permanent Members</a></li>
+                    <li><a href="#events" class="nav-link">Our Events</a></li>
                     <li><a href="#contributors" class="nav-link">Our Contributors</a></li>
                     <li><a href="#contribute" class="nav-link">Contribute Here</a></li>
                 </ul>
@@ -164,7 +180,7 @@
                 </section>
             </aside>
 
-            <!-- B. Main Content (Desktop) -->
+            <!-- Main Content (Desktop) -->
             <main class="main-content-area">
                 <section id="events" class="content-section">
                     <h2 style="text-transform: uppercase;">OUR EVENTS</h2>
@@ -173,24 +189,7 @@
                     </div>
                 </section>
 
-                <section id="members" class="content-section">
-                    <!-- PERMANENT MEMBERS WITH SCROLL & SEARCH -->
-                    <h2 style="text-transform: uppercase; margin-bottom: 5px;">PERMANENT MEMBERS</h2>
-                    <p class="membership-fee"><em>(Entry Fee: ₹5,000 | Monthly Subscription: ₹100)</em></p>
-                    
-                    <div class="directory-wrapper">
-                        <!-- Sticky Search Bar -->
-                        <input type="text" id="memberSearch" placeholder="Search member by name..." class="member-search-input" />
-                        
-                        <!-- Fixed Height Scrollable Box -->
-                        <div class="contributors-list scrollable-directory" id="membersContainer">
-                            <!-- Populated dynamically via script.js -->
-                        </div>
-                    </div>
-                </section>
-
                 <section id="contributors" class="content-section">
-                    <!-- DYNAMIC MONTH HEADING ID ADDED HERE -->
                     <h2 id="contribution-month-heading" style="text-transform: uppercase; margin-top: 20px;">
                         CONTRIBUTIONS IN JUNE
                     </h2>
@@ -200,7 +199,6 @@
                 </section>
             </main>
         </div>
-        <!-- /.desktop-layout -->
 
         <!-- VII. Footer (Contribute Here) -->
         <footer id="contribute" class="main-footer content-section">

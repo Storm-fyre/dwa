@@ -6,6 +6,9 @@
     <title>DWA Admin Dashboard</title>
     <link rel="stylesheet" href="style.css">
     
+    <!-- Cropper.js CSS for 1:1 locked avatar cropping -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+
     <!-- PostHog Analytics -->
     <script>
         !function(t,e){var o,n,p,r;e.__SV||(window.posthog&&window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys getNextSurveyStep onSessionId setPersonProperties".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
@@ -24,14 +27,14 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .admin-table th, .admin-table td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        .admin-table th, .admin-table td { padding: 12px; border: 1px solid #ddd; text-align: left; vertical-align: middle; }
         .admin-table th { background-color: #f8f8f8; }
         .admin-form { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: #f9f9f9; padding: 15px; border-radius: 5px; border-left: 4px solid #3498db; }
         .admin-form input, .admin-form textarea { padding: 10px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 200px; }
         .btn-add { background: #3498db; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; font-weight: bold; }
         .btn-delete { background: #e74c3c; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
 
-        /* --- FIXED ADMIN HEADER LAYOUT --- */
+        /* Admin Header */
         .admin-header {
             background-color: #f8f8f8;
             border-bottom: 1px solid #ddd;
@@ -42,9 +45,7 @@
             gap: 15px;
             position: relative;
         }
-        .admin-header .main-title {
-            margin: 0;
-        }
+        .admin-header .main-title { margin: 0; }
         .admin-back-btn {
             color: #800000;
             font-weight: bold;
@@ -54,30 +55,75 @@
             border-radius: 5px;
             transition: 0.2s;
         }
-        .admin-back-btn:hover {
-            background-color: #800000;
-            color: #D4AF37;
-            text-decoration: none;
+        .admin-back-btn:hover { background-color: #800000; color: #D4AF37; }
+
+        @media (min-width: 768px) {
+            .admin-header { flex-direction: row; justify-content: center; }
+            .admin-back-btn { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); }
         }
 
-        /* Desktop Layout for Header */
-        @media (min-width: 768px) {
-            .admin-header {
-                flex-direction: row;
-                justify-content: center;
-            }
-            .admin-back-btn {
-                position: absolute;
-                left: 20px;
-                top: 50%;
-                transform: translateY(-50%); /* perfectly centers it vertically */
-            }
+        /* 1:1 Crop Modal Styling */
+        #cropper-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        .cropper-container-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 520px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .cropper-image-wrapper {
+            width: 100%;
+            height: 340px;
+            background: #222;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cropper-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .btn-crop-cancel {
+            padding: 8px 16px;
+            background: #eee;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-crop-apply {
+            padding: 8px 18px;
+            background: #800000;
+            color: #D4AF37;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
         }
     </style>
 </head>
 <body style="background-color: #f4f4f4;">
     
-    <!-- FIXED HEADER -->
+    <!-- HEADER -->
     <header class="admin-header">
         <a href="index.html" class="admin-back-btn">← Back to Site</a>
         <h1 class="main-title">DWA Admin Portal</h1>
@@ -104,12 +150,43 @@
         <!-- MEMBERS TAB -->
         <div id="tab-members" class="tab-content active">
             <h2>Manage Permanent Members</h2>
-            <div class="admin-form">
-                <input type="text" id="new-member-name" placeholder="Member Name (e.g., Ashok Sirsi గారు)">
-                <button class="btn-add" onclick="addMember()">Add Member</button>
+            <div class="admin-form" style="flex-direction: column;">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; width: 100%;">
+                    <input type="text" id="new-member-name" placeholder="Member Name (e.g., Ashok Sirsi గారు)" style="flex: 2;">
+                    <input type="number" id="new-member-due" placeholder="Due Amount (₹) - Enter 0 if fully paid" min="0" style="flex: 1;">
+                </div>
+
+                <!-- 1:1 SQUARE PHOTO CROPPER SELECTOR -->
+                <div style="width: 100%; border: 1px solid #ccc; padding: 12px; border-radius: 4px; background: #fff; box-sizing: border-box;">
+                    <label style="font-weight: bold; margin-bottom: 8px; display: block; color: #800000;">Member Photo (Square 1:1 Cropped)</label>
+                    <input type="file" id="member-photo-input" accept="image/*" style="display: none;">
+                    
+                    <button type="button" id="btn-choose-member-photo" style="width: 100%; border: 2px dashed #800000; padding: 10px; font-size: 0.95rem; cursor: pointer; border-radius: 4px; background: #fafafa; font-weight: bold; color: #333;">
+                        📸 Choose & Crop Member Photo
+                    </button>
+                    
+                    <div id="member-photo-preview-wrap" style="display: none; align-items: center; justify-content: space-between; margin-top: 10px; background: #fdfdfd; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <img id="member-photo-preview" src="" alt="Cropped Preview" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #D4AF37;">
+                            <span style="color: #27ae60; font-weight: bold; font-size: 0.9rem;">Square Photo Ready</span>
+                        </div>
+                        <button type="button" onclick="clearMemberPhoto()" style="background: none; border: none; color: #e74c3c; font-size: 1.2rem; cursor: pointer; font-weight: bold;" title="Remove Photo">✖</button>
+                    </div>
+                </div>
+
+                <button class="btn-add" id="btn-add-member" onclick="addMember()" style="margin-top: 5px;">Add Member</button>
+                <p id="member-upload-status" style="color: #3498db; margin: 0; display: none; text-align: center; font-weight: bold; margin-top: 5px;">Uploading photo and saving member...</p>
             </div>
+
             <table class="admin-table">
-                <thead><tr><th>Name</th><th>Action</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th style="width: 70px;">Photo</th>
+                        <th>Name</th>
+                        <th>Due Status</th>
+                        <th style="width: 80px;">Action</th>
+                    </tr>
+                </thead>
                 <tbody id="members-list"></tbody>
             </table>
         </div>
@@ -135,16 +212,11 @@
                 <input type="text" id="new-event-title" placeholder="Event Title">
                 <textarea id="new-event-desc" placeholder="Event Description" rows="3"></textarea>
                 
-                <!-- NEW PHOTO UPLOAD QUEUE -->
-                <div style="width: 100%; border: 1px solid #ccc; padding: 15px; border-radius: 4px; background: #fff;">
+                <div style="width: 100%; border: 1px solid #ccc; padding: 15px; border-radius: 4px; background: #fff; box-sizing: border-box;">
                     <label style="font-weight: bold; margin-bottom: 10px; display: block; color: #800000;">Upload Event Photo(s) (JPG/PNG)</label>
-                    
                     <input type="file" id="new-event-image" accept=".jpg, .jpeg, .png" multiple style="display: none;">
                     <button type="button" id="customUploadBtn" class="btn-clear" style="width: 100%; border: 2px dashed #800000; padding: 12px; font-size: 1rem; cursor: pointer; border-radius: 4px; background: #fdfdfd; font-weight: bold; color: #333;">📸 Tap here to choose photo(s)</button>
-                    
-                    <div id="photo_queue" style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;">
-                        <!-- Selected photos appear here -->
-                    </div>
+                    <div id="photo_queue" style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;"></div>
                 </div>
 
                 <button class="btn-add" id="btn-add-event" onclick="addEvent()" style="margin-top: 10px; width: 100%;">Add Event</button>
@@ -167,7 +239,23 @@
         </div>
     </div>
 
-    <!-- Image Compression Script -->
+    <!-- 1:1 SQUARE CROPPER MODAL -->
+    <div id="cropper-modal">
+        <div class="cropper-container-box">
+            <h3 style="margin: 0; color: #800000;">Crop Photo (Locked 1:1 Square)</h3>
+            <p style="margin: 0; font-size: 0.85rem; color: #666;">Drag and resize the square to center the member's face.</p>
+            <div class="cropper-image-wrapper">
+                <img id="cropper-modal-image" src="" alt="Image to crop" style="max-width: 100%; display: block;">
+            </div>
+            <div class="cropper-actions">
+                <button type="button" class="btn-crop-cancel" onclick="cancelCrop()">Cancel</button>
+                <button type="button" class="btn-crop-apply" onclick="applyCrop()">Apply Crop</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Compression & Cropping Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/compressorjs/1.2.1/compressor.min.js"></script>
     <script src="admin.js"></script>
 </body>

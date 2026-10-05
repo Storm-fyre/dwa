@@ -2,6 +2,8 @@ DROP TABLE IF EXISTS members;
 CREATE TABLE members (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
+    photo_url TEXT DEFAULT '',
+    due_amount INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
