@@ -85,7 +85,7 @@ memberPhotoInput.addEventListener('change', (e) => {
     const reader = new FileReader();
     reader.onload = (event) => {
         cropperModalImage.src = event.target.result;
-        cropperModal.style.display = 'flex';
+        cropperModal.style.display = 'flex'; // Opens in front with z-index: 10000
 
         if (memberCropper) {
             memberCropper.destroy();
@@ -145,9 +145,15 @@ window.applyCrop = function() {
                 } else {
                     croppedEditMemberFile = readyFile;
                     document.getElementById('edit-member-photo-preview').src = URL.createObjectURL(result);
+                    const photoStatus = document.getElementById('edit-photo-status');
+                    if (photoStatus) {
+                        photoStatus.textContent = 'New Photo Ready';
+                        photoStatus.style.color = '#27ae60';
+                        photoStatus.style.fontWeight = 'bold';
+                    }
                 }
                 
-                cancelCrop();
+                cancelCrop(); // Closes cropper modal, smoothly revealing Edit modal underneath
             },
             error(err) {
                 alert("Error optimizing photo: " + err.message);
@@ -179,7 +185,7 @@ async function loadMembers() {
         
         const paidAmount = parseInt(m.paid_amount, 10) || 0;
 
-        // Payment status badge in admin: Green if >= 3000, Red if < 3000 (No "Due" or "Paid" text)
+        // Payment status badge in admin: Green if >= 3000, Red if < 3000
         const paymentBadge = (paidAmount >= 3000)
             ? `<span style="color: #27ae60; background: #eafaf1; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">₹${paidAmount.toLocaleString('en-IN')}</span>`
             : `<span style="color: #c0392b; background: #fde8e8; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">₹${paidAmount.toLocaleString('en-IN')}</span>`;
@@ -271,6 +277,13 @@ window.openEditMember = function(index) {
 
     const previewImg = document.getElementById('edit-member-photo-preview');
     previewImg.src = member.photo_url || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24"><text x="50%" y="50%" font-size="16" dominant-baseline="middle" text-anchor="middle" fill="%23aaa">👤</text></svg>';
+
+    const photoStatus = document.getElementById('edit-photo-status');
+    if (photoStatus) {
+        photoStatus.textContent = member.photo_url ? 'Current Photo' : 'No Photo';
+        photoStatus.style.color = '#666';
+        photoStatus.style.fontWeight = 'normal';
+    }
 
     document.getElementById('edit-upload-status').style.display = 'none';
     document.getElementById('edit-member-modal').style.display = 'flex';

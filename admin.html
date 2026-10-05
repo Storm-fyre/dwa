@@ -65,11 +65,10 @@
             .admin-back-btn { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); }
         }
 
-        /* 1:1 Crop Modal Styling */
-        #cropper-modal, #edit-member-modal {
+        /* Modal Base */
+        .admin-modal-overlay {
             display: none;
             position: fixed;
-            z-index: 9999;
             left: 0;
             top: 0;
             width: 100vw;
@@ -80,6 +79,17 @@
             padding: 15px;
             box-sizing: border-box;
         }
+
+        /* EDIT MODAL (Layer 9990) */
+        #edit-member-modal {
+            z-index: 9990;
+        }
+
+        /* CROPPER MODAL (Layer 10000 - ALWAYS ON TOP) */
+        #cropper-modal {
+            z-index: 10000;
+        }
+
         .modal-box {
             background: #fff;
             padding: 22px;
@@ -89,7 +99,7 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.6);
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -247,23 +257,8 @@
         </div>
     </div>
 
-    <!-- 1:1 SQUARE CROPPER MODAL -->
-    <div id="cropper-modal">
-        <div class="modal-box">
-            <h3 style="margin: 0; color: #800000;">Crop Photo (Locked 1:1 Square)</h3>
-            <p style="margin: 0; font-size: 0.85rem; color: #666;">Drag and resize the square to center the member's face.</p>
-            <div class="cropper-image-wrapper">
-                <img id="cropper-modal-image" src="" alt="Image to crop" style="max-width: 100%; display: block;">
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-modal-cancel" onclick="cancelCrop()">Cancel</button>
-                <button type="button" class="btn-modal-save" onclick="applyCrop()">Apply Crop</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- EDIT MEMBER MODAL -->
-    <div id="edit-member-modal">
+    <!-- EDIT MEMBER MODAL (Layer 9990) -->
+    <div id="edit-member-modal" class="admin-modal-overlay">
         <div class="modal-box">
             <h3 style="margin: 0; color: #800000;">Edit Permanent Member</h3>
             <input type="hidden" id="edit-member-id">
@@ -278,18 +273,36 @@
             <input type="number" id="edit-member-paid" placeholder="Amount Paid" min="0" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
 
             <label style="font-weight: bold; font-size: 0.9rem;">Member Photo:</label>
-            <div style="display: flex; align-items: center; gap: 15px; background: #fafafa; padding: 10px; border-radius: 4px; border: 1px solid #eee;">
-                <img id="edit-member-photo-preview" src="" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #D4AF37;">
-                <button type="button" onclick="triggerEditPhotoUpload()" style="padding: 6px 12px; background: #fff; border: 1px solid #800000; color: #800000; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; background: #fafafa; padding: 10px 14px; border-radius: 4px; border: 1px solid #eee;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <img id="edit-member-photo-preview" src="" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #D4AF37;">
+                    <span id="edit-photo-status" style="font-size: 0.85rem; color: #666;">Current Photo</span>
+                </div>
+                <button type="button" onclick="triggerEditPhotoUpload()" style="padding: 7px 14px; background: #fff; border: 1px solid #800000; color: #800000; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
                     📸 Change / Crop Photo
                 </button>
             </div>
 
-            <p id="edit-upload-status" style="color: #3498db; margin: 0; display: none; text-align: center; font-weight: bold; font-size: 0.9rem;">Updating member...</p>
+            <p id="edit-upload-status" style="color: #3498db; margin: 0; display: none; text-align: center; font-weight: bold; font-size: 0.9rem;">Saving changes...</p>
 
             <div class="modal-actions">
                 <button type="button" class="btn-modal-cancel" onclick="closeEditModal()">Cancel</button>
                 <button type="button" class="btn-modal-save" id="btn-save-member-edit" onclick="updateMember()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1:1 SQUARE CROPPER MODAL (Layer 10000 - POPS UP IN FRONT) -->
+    <div id="cropper-modal" class="admin-modal-overlay">
+        <div class="modal-box">
+            <h3 style="margin: 0; color: #800000;">Crop Photo (Locked 1:1 Square)</h3>
+            <p style="margin: 0; font-size: 0.85rem; color: #666;">Drag and resize the square to center the member's face.</p>
+            <div class="cropper-image-wrapper">
+                <img id="cropper-modal-image" src="" alt="Image to crop" style="max-width: 100%; display: block;">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-modal-cancel" onclick="cancelCrop()">Cancel</button>
+                <button type="button" class="btn-modal-save" onclick="applyCrop()">Apply Crop</button>
             </div>
         </div>
     </div>
