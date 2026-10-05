@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // =========================================================
-    // PERMANENT MEMBERS DIRECTORY (PHOTO + PHONE + GREEN/RED)
+    // PERMANENT MEMBERS DIRECTORY (PHOTO + PHONE + GREEN/RED AMOUNT)
     // =========================================================
     let allMembers = [];
     let filteredMembers = [];
@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         const query = e.target.value.toLowerCase().trim();
                         filteredMembers = allMembers.filter(m => 
                             (m.name && m.name.toLowerCase().includes(query)) ||
-                            (m.phone && m.phone.toLowerCase().includes(query))
+                            (m.phone && m.phone.includes(query))
                         );
                         renderMemberChunk(true);
                     });
@@ -246,18 +246,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 </a>
             ` : '';
 
-            // Payment logic: >= 3000 is GREEN, < 3000 is RED
+            // Payment number: >= 3000 is GREEN, < 3000 is RED (No "Due" word)
             const paid = parseInt(member.paid_amount, 10) || 0;
-            const due = (member.due_amount !== undefined && member.due_amount !== null)
-                ? parseInt(member.due_amount, 10)
-                : Math.max(0, 3000 - paid);
-
-            let badgeHtml = '';
-            if (paid >= 3000) {
-                badgeHtml = `<span class="member-paid-badge">₹${paid.toLocaleString('en-IN')}</span>`;
-            } else {
-                badgeHtml = `<span class="member-due-badge">Due: ₹${due.toLocaleString('en-IN')}</span>`;
-            }
+            const badgeClass = (paid >= 3000) ? 'member-paid-badge' : 'member-due-badge';
+            const badgeHtml = `<span class="${badgeClass}">₹${paid.toLocaleString('en-IN')}</span>`;
 
             card.innerHTML = `
                 ${photoHtml}

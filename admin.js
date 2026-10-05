@@ -178,12 +178,11 @@ async function loadMembers() {
             : `<div style="width:42px; height:42px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; color:#888; font-size:1.1rem;">👤</div>`;
         
         const paidAmount = parseInt(m.paid_amount, 10) || 0;
-        const dueAmount = (m.due_amount !== undefined && m.due_amount !== null) ? m.due_amount : Math.max(0, 3000 - paidAmount);
 
-        // Payment status badge
+        // Payment status badge in admin: Green if >= 3000, Red if < 3000 (No "Due" or "Paid" text)
         const paymentBadge = (paidAmount >= 3000)
-            ? `<span style="color: #27ae60; background: #eafaf1; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">₹${paidAmount.toLocaleString('en-IN')} (Paid)</span>`
-            : `<span style="color: #c0392b; background: #fde8e8; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">₹${paidAmount.toLocaleString('en-IN')} (Due: ₹${dueAmount.toLocaleString('en-IN')})</span>`;
+            ? `<span style="color: #27ae60; background: #eafaf1; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">₹${paidAmount.toLocaleString('en-IN')}</span>`
+            : `<span style="color: #c0392b; background: #fde8e8; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">₹${paidAmount.toLocaleString('en-IN')}</span>`;
 
         return `
             <tr>
