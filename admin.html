@@ -20,7 +20,7 @@
     </script>
 
     <style>
-        .admin-wrapper { max-width: 900px; margin: 40px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .admin-wrapper { max-width: 950px; margin: 40px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; flex-wrap: wrap; }
         .tab-btn { padding: 10px 20px; border: none; background: #eee; cursor: pointer; font-weight: bold; border-radius: 4px; }
         .tab-btn.active { background: #800000; color: #D4AF37; }
@@ -30,9 +30,12 @@
         .admin-table th, .admin-table td { padding: 12px; border: 1px solid #ddd; text-align: left; vertical-align: middle; }
         .admin-table th { background-color: #f8f8f8; }
         .admin-form { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: #f9f9f9; padding: 15px; border-radius: 5px; border-left: 4px solid #3498db; }
-        .admin-form input, .admin-form textarea { padding: 10px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 200px; }
+        .admin-form input, .admin-form textarea { padding: 10px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 180px; box-sizing: border-box; }
         .btn-add { background: #3498db; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; font-weight: bold; }
-        .btn-delete { background: #e74c3c; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
+        .btn-edit { background: #f39c12; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-right: 5px; }
+        .btn-edit:hover { background: #d68910; }
+        .btn-delete { background: #e74c3c; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        .btn-delete:hover { background: #c0392b; }
 
         /* Admin Header */
         .admin-header {
@@ -63,7 +66,7 @@
         }
 
         /* 1:1 Crop Modal Styling */
-        #cropper-modal {
+        #cropper-modal, #edit-member-modal {
             display: none;
             position: fixed;
             z-index: 9999;
@@ -77,9 +80,9 @@
             padding: 15px;
             box-sizing: border-box;
         }
-        .cropper-container-box {
+        .modal-box {
             background: #fff;
-            padding: 20px;
+            padding: 22px;
             border-radius: 8px;
             max-width: 520px;
             width: 100%;
@@ -87,22 +90,25 @@
             flex-direction: column;
             gap: 15px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            max-height: 90vh;
+            overflow-y: auto;
         }
         .cropper-image-wrapper {
             width: 100%;
-            height: 340px;
+            height: 330px;
             background: #222;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .cropper-actions {
+        .modal-actions {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
+            margin-top: 5px;
         }
-        .btn-crop-cancel {
+        .btn-modal-cancel {
             padding: 8px 16px;
             background: #eee;
             border: 1px solid #ccc;
@@ -110,7 +116,7 @@
             cursor: pointer;
             font-weight: bold;
         }
-        .btn-crop-apply {
+        .btn-modal-save {
             padding: 8px 18px;
             background: #800000;
             color: #D4AF37;
@@ -153,7 +159,8 @@
             <div class="admin-form" style="flex-direction: column;">
                 <div style="display: flex; gap: 10px; flex-wrap: wrap; width: 100%;">
                     <input type="text" id="new-member-name" placeholder="Member Name (e.g., Ashok Sirsi గారు)" style="flex: 2;">
-                    <input type="number" id="new-member-due" placeholder="Due Amount (₹) - Enter 0 if fully paid" min="0" style="flex: 1;">
+                    <input type="tel" id="new-member-phone" placeholder="Phone Number (e.g., 9849797360)" style="flex: 1.5;">
+                    <input type="number" id="new-member-paid" placeholder="Amount Paid (₹) - e.g. 5000 or 1000" min="0" style="flex: 1.5;">
                 </div>
 
                 <!-- 1:1 SQUARE PHOTO CROPPER SELECTOR -->
@@ -170,21 +177,22 @@
                             <img id="member-photo-preview" src="" alt="Cropped Preview" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #D4AF37;">
                             <span style="color: #27ae60; font-weight: bold; font-size: 0.9rem;">Square Photo Ready</span>
                         </div>
-                        <button type="button" onclick="clearMemberPhoto()" style="background: none; border: none; color: #e74c3c; font-size: 1.2rem; cursor: pointer; font-weight: bold;" title="Remove Photo">✖</button>
+                        <button type="button" onclick="clearNewMemberPhoto()" style="background: none; border: none; color: #e74c3c; font-size: 1.2rem; cursor: pointer; font-weight: bold;" title="Remove Photo">✖</button>
                     </div>
                 </div>
 
                 <button class="btn-add" id="btn-add-member" onclick="addMember()" style="margin-top: 5px;">Add Member</button>
-                <p id="member-upload-status" style="color: #3498db; margin: 0; display: none; text-align: center; font-weight: bold; margin-top: 5px;">Uploading photo and saving member...</p>
+                <p id="member-upload-status" style="color: #3498db; margin: 0; display: none; text-align: center; font-weight: bold; margin-top: 5px;">Saving member...</p>
             </div>
 
             <table class="admin-table">
                 <thead>
                     <tr>
-                        <th style="width: 70px;">Photo</th>
+                        <th style="width: 60px;">Photo</th>
                         <th>Name</th>
-                        <th>Due Status</th>
-                        <th style="width: 80px;">Action</th>
+                        <th>Phone</th>
+                        <th>Payment Status</th>
+                        <th style="width: 140px; text-align: center;">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="members-list"></tbody>
@@ -241,15 +249,47 @@
 
     <!-- 1:1 SQUARE CROPPER MODAL -->
     <div id="cropper-modal">
-        <div class="cropper-container-box">
+        <div class="modal-box">
             <h3 style="margin: 0; color: #800000;">Crop Photo (Locked 1:1 Square)</h3>
             <p style="margin: 0; font-size: 0.85rem; color: #666;">Drag and resize the square to center the member's face.</p>
             <div class="cropper-image-wrapper">
                 <img id="cropper-modal-image" src="" alt="Image to crop" style="max-width: 100%; display: block;">
             </div>
-            <div class="cropper-actions">
-                <button type="button" class="btn-crop-cancel" onclick="cancelCrop()">Cancel</button>
-                <button type="button" class="btn-crop-apply" onclick="applyCrop()">Apply Crop</button>
+            <div class="modal-actions">
+                <button type="button" class="btn-modal-cancel" onclick="cancelCrop()">Cancel</button>
+                <button type="button" class="btn-modal-save" onclick="applyCrop()">Apply Crop</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT MEMBER MODAL -->
+    <div id="edit-member-modal">
+        <div class="modal-box">
+            <h3 style="margin: 0; color: #800000;">Edit Permanent Member</h3>
+            <input type="hidden" id="edit-member-id">
+            
+            <label style="font-weight: bold; font-size: 0.9rem;">Member Name:</label>
+            <input type="text" id="edit-member-name" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+
+            <label style="font-weight: bold; font-size: 0.9rem;">Phone Number:</label>
+            <input type="tel" id="edit-member-phone" placeholder="Phone Number" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+
+            <label style="font-weight: bold; font-size: 0.9rem;">Amount Paid (₹):</label>
+            <input type="number" id="edit-member-paid" placeholder="Amount Paid" min="0" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+
+            <label style="font-weight: bold; font-size: 0.9rem;">Member Photo:</label>
+            <div style="display: flex; align-items: center; gap: 15px; background: #fafafa; padding: 10px; border-radius: 4px; border: 1px solid #eee;">
+                <img id="edit-member-photo-preview" src="" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #D4AF37;">
+                <button type="button" onclick="triggerEditPhotoUpload()" style="padding: 6px 12px; background: #fff; border: 1px solid #800000; color: #800000; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
+                    📸 Change / Crop Photo
+                </button>
+            </div>
+
+            <p id="edit-upload-status" style="color: #3498db; margin: 0; display: none; text-align: center; font-weight: bold; font-size: 0.9rem;">Updating member...</p>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-modal-cancel" onclick="closeEditModal()">Cancel</button>
+                <button type="button" class="btn-modal-save" id="btn-save-member-edit" onclick="updateMember()">Save Changes</button>
             </div>
         </div>
     </div>

@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // =========================================================
-    // PERMANENT MEMBERS DIRECTORY (PHOTO + DUE LOGIC)
+    // PERMANENT MEMBERS DIRECTORY (PHOTO + PHONE + GREEN/RED)
     // =========================================================
     let allMembers = [];
     let filteredMembers = [];
@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (data && data.length > 0) {
                 // Sort with Telugu locale collation
-                allMembers = data.sort((a, b) => a.name.localeCompare(b.name, 'te')); 
+                allMembers = data.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'te')); 
                 filteredMembers = [...allMembers];
                 
                 renderMemberChunk(true);
@@ -200,7 +200,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (memberSearch) {
                     memberSearch.addEventListener('input', (e) => {
                         const query = e.target.value.toLowerCase().trim();
-                        filteredMembers = allMembers.filter(m => m.name.toLowerCase().includes(query));
+                        filteredMembers = allMembers.filter(m => 
+                            (m.name && m.name.toLowerCase().includes(query)) ||
+                            (m.phone && m.phone.toLowerCase().includes(query))
+                        );
                         renderMemberChunk(true);
                     });
                 }
@@ -236,17 +239,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 ? `<img src="${member.photo_url}" alt="${member.name}" class="member-avatar" loading="lazy">` 
                 : `<div class="member-avatar-placeholder">👤</div>`;
 
-            // Display "Due: ₹..." badge ONLY if pending balance exists; otherwise show nothing
-            const dueAmount = parseInt(member.due_amount, 10);
-            const dueBadgeHtml = (dueAmount && dueAmount > 0)
-                ? `<span class="member-due-badge">Due: ₹${dueAmount.toLocaleString('en-IN')}</span>`
-                : '';
+            // Phone number link
+            const phoneHtml = member.phone ? `
+                <a href="tel:${member.phone.replace(/\s+/g, '')}" class="member-phone">
+                    <span>📞</span> ${member.phone}
+                </a>
+            ` : '';
+
+            // Payment logic: >= 3000 is GREEN, < 3000 is RED
+            const paid = parseInt(member.paid_amount, 10) || 0;
+            const due = (member.due_amount !== undefined && member.due_amount !== null)
+                ? parseInt(member.due_amount, 10)
+                : Math.max(0, 3000 - paid);
+
+            let badgeHtml = '';
+            if (paid >= 3000) {
+                badgeHtml = `<span class="member-paid-badge">₹${paid.toLocaleString('en-IN')}</span>`;
+            } else {
+                badgeHtml = `<span class="member-due-badge">Due: ₹${due.toLocaleString('en-IN')}</span>`;
+            }
 
             card.innerHTML = `
                 ${photoHtml}
                 <div class="member-info">
                     <p class="member-name">${member.name}</p>
-                    ${dueBadgeHtml}
+                    ${phoneHtml}
+                    ${badgeHtml}
                 </div>
             `;
             fragment.appendChild(card);

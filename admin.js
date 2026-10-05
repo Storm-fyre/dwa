@@ -1,4 +1,5 @@
 let token = localStorage.getItem('dwaAdminToken');
+let loadedMembersList = [];
 
 // --- Authentication ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -40,7 +41,7 @@ window.switchTab = function(tabName) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`tab-${tabName}`).classList.add('active');
-    event.target.classList.add('active');
+    if (event && event.target) event.target.classList.add('active');
 };
 
 function loadAllData() {
@@ -56,7 +57,9 @@ const headers = () => ({ 'Authorization': `Bearer ${token}`, 'Content-Type': 'ap
 // --- Member Photo 1:1 Cropping & Upload ---
 // ==========================================
 let memberCropper = null;
-let croppedMemberFile = null;
+let cropTarget = 'new'; // 'new' or 'edit'
+let croppedNewMemberFile = null;
+let croppedEditMemberFile = null;
 
 const memberPhotoInput = document.getElementById('member-photo-input');
 const chooseMemberPhotoBtn = document.getElementById('btn-choose-member-photo');
@@ -66,8 +69,14 @@ const memberPhotoPreviewWrap = document.getElementById('member-photo-preview-wra
 const memberPhotoPreview = document.getElementById('member-photo-preview');
 
 chooseMemberPhotoBtn.addEventListener('click', () => {
+    cropTarget = 'new';
     memberPhotoInput.click();
 });
+
+window.triggerEditPhotoUpload = function() {
+    cropTarget = 'edit';
+    memberPhotoInput.click();
+};
 
 memberPhotoInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
@@ -121,17 +130,22 @@ window.applyCrop = function() {
     });
 
     canvas.toBlob((blob) => {
-        // Compress the cropped square avatar
         new Compressor(blob, {
             quality: 0.75,
             maxWidth: 400,
             maxHeight: 400,
             mimeType: 'image/jpeg',
             success(result) {
-                croppedMemberFile = new File([result], `member_${Date.now()}.jpg`, { type: 'image/jpeg' });
+                const readyFile = new File([result], `member_${Date.now()}.jpg`, { type: 'image/jpeg' });
                 
-                memberPhotoPreview.src = URL.createObjectURL(result);
-                memberPhotoPreviewWrap.style.display = 'flex';
+                if (cropTarget === 'new') {
+                    croppedNewMemberFile = readyFile;
+                    memberPhotoPreview.src = URL.createObjectURL(result);
+                    memberPhotoPreviewWrap.style.display = 'flex';
+                } else {
+                    croppedEditMemberFile = readyFile;
+                    document.getElementById('edit-member-photo-preview').src = URL.createObjectURL(result);
+                }
                 
                 cancelCrop();
             },
@@ -143,45 +157,60 @@ window.applyCrop = function() {
     }, 'image/jpeg', 0.9);
 };
 
-window.clearMemberPhoto = function() {
-    croppedMemberFile = null;
+window.clearNewMemberPhoto = function() {
+    croppedNewMemberFile = null;
     memberPhotoPreview.src = '';
     memberPhotoPreviewWrap.style.display = 'none';
 };
 
-// --- Members CRUD ---
+// ==========================================
+// --- Members CRUD (Add, Edit, Delete) ---
+// ==========================================
 async function loadMembers() {
     const res = await fetch('/api/members');
     const data = await res.json();
+    loadedMembersList = data || [];
+
     const tbody = document.getElementById('members-list');
-    tbody.innerHTML = data.map(m => {
+    tbody.innerHTML = loadedMembersList.map((m, index) => {
         const photoHtml = m.photo_url 
-            ? `<img src="${m.photo_url}" width="45" height="45" style="border-radius:50%; object-fit:cover; border:1px solid #D4AF37;">` 
-            : `<div style="width:45px; height:45px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; color:#888; font-size:1.2rem;">👤</div>`;
+            ? `<img src="${m.photo_url}" width="42" height="42" style="border-radius:50%; object-fit:cover; border:1px solid #D4AF37;">` 
+            : `<div style="width:42px; height:42px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; color:#888; font-size:1.1rem;">👤</div>`;
         
-        const dueHtml = (m.due_amount && m.due_amount > 0)
-            ? `<span style="color: #c0392b; font-weight: bold; background: #fde8e8; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">Due: ₹${m.due_amount}</span>`
-            : `<span style="color: #27ae60; font-weight: bold; background: #eafaf1; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">Paid</span>`;
+        const paidAmount = parseInt(m.paid_amount, 10) || 0;
+        const dueAmount = (m.due_amount !== undefined && m.due_amount !== null) ? m.due_amount : Math.max(0, 3000 - paidAmount);
+
+        // Payment status badge
+        const paymentBadge = (paidAmount >= 3000)
+            ? `<span style="color: #27ae60; background: #eafaf1; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">₹${paidAmount.toLocaleString('en-IN')} (Paid)</span>`
+            : `<span style="color: #c0392b; background: #fde8e8; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">₹${paidAmount.toLocaleString('en-IN')} (Due: ₹${dueAmount.toLocaleString('en-IN')})</span>`;
 
         return `
             <tr>
                 <td>${photoHtml}</td>
                 <td><strong>${m.name}</strong></td>
-                <td>${dueHtml}</td>
-                <td><button class="btn-delete" onclick="deleteItem('/api/members', ${m.id}, loadMembers)">Delete</button></td>
+                <td>${m.phone ? `📞 ${m.phone}` : '<span style="color:#aaa;">-</span>'}</td>
+                <td>${paymentBadge}</td>
+                <td style="text-align: center;">
+                    <button class="btn-edit" onclick="openEditMember(${index})">Edit</button>
+                    <button class="btn-delete" onclick="deleteItem('/api/members', ${m.id}, loadMembers)">Delete</button>
+                </td>
             </tr>
         `;
     }).join('');
 }
 
+// Add New Member
 window.addMember = async function() {
     const nameInput = document.getElementById('new-member-name');
-    const dueInput = document.getElementById('new-member-due');
+    const phoneInput = document.getElementById('new-member-phone');
+    const paidInput = document.getElementById('new-member-paid');
     const btn = document.getElementById('btn-add-member');
     const status = document.getElementById('member-upload-status');
 
     const name = nameInput.value.trim();
-    const dueAmount = parseInt(dueInput.value, 10) || 0;
+    const phone = phoneInput.value.trim();
+    const paidAmount = parseInt(paidInput.value, 10) || 0;
 
     if (!name) return alert("Please enter the member's name");
 
@@ -190,10 +219,9 @@ window.addMember = async function() {
 
     let photoUrl = '';
 
-    // Upload photo if cropped
-    if (croppedMemberFile) {
+    if (croppedNewMemberFile) {
         const formData = new FormData();
-        formData.append('image', croppedMemberFile);
+        formData.append('image', croppedNewMemberFile);
         try {
             const uploadRes = await fetch('/api/upload', {
                 method: 'POST',
@@ -212,18 +240,95 @@ window.addMember = async function() {
         }
     }
 
-    // Save to D1
     await fetch('/api/members', {
         method: 'POST',
         headers: headers(),
-        body: JSON.stringify({ name, photo_url: photoUrl, due_amount: dueAmount })
+        body: JSON.stringify({ name, phone, paid_amount: paidAmount, photo_url: photoUrl })
     });
 
     nameInput.value = '';
-    dueInput.value = '';
-    clearMemberPhoto();
+    phoneInput.value = '';
+    paidInput.value = '';
+    clearNewMemberPhoto();
     btn.disabled = false;
     status.style.display = 'none';
+    loadMembers();
+};
+
+// Edit Member Modal Handlers
+let editMemberExistingPhotoUrl = '';
+
+window.openEditMember = function(index) {
+    const member = loadedMembersList[index];
+    if (!member) return;
+
+    document.getElementById('edit-member-id').value = member.id;
+    document.getElementById('edit-member-name').value = member.name || '';
+    document.getElementById('edit-member-phone').value = member.phone || '';
+    document.getElementById('edit-member-paid').value = member.paid_amount || 0;
+
+    editMemberExistingPhotoUrl = member.photo_url || '';
+    croppedEditMemberFile = null;
+
+    const previewImg = document.getElementById('edit-member-photo-preview');
+    previewImg.src = member.photo_url || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24"><text x="50%" y="50%" font-size="16" dominant-baseline="middle" text-anchor="middle" fill="%23aaa">👤</text></svg>';
+
+    document.getElementById('edit-upload-status').style.display = 'none';
+    document.getElementById('edit-member-modal').style.display = 'flex';
+};
+
+window.closeEditModal = function() {
+    document.getElementById('edit-member-modal').style.display = 'none';
+    croppedEditMemberFile = null;
+};
+
+// Save Edited Member
+window.updateMember = async function() {
+    const id = document.getElementById('edit-member-id').value;
+    const name = document.getElementById('edit-member-name').value.trim();
+    const phone = document.getElementById('edit-member-phone').value.trim();
+    const paidAmount = parseInt(document.getElementById('edit-member-paid').value, 10) || 0;
+    const btn = document.getElementById('btn-save-member-edit');
+    const status = document.getElementById('edit-upload-status');
+
+    if (!name) return alert("Member name cannot be empty");
+
+    btn.disabled = true;
+    status.style.display = 'block';
+
+    let finalPhotoUrl = editMemberExistingPhotoUrl;
+
+    // If admin cropped a new photo for this member
+    if (croppedEditMemberFile) {
+        const formData = new FormData();
+        formData.append('image', croppedEditMemberFile);
+        try {
+            const uploadRes = await fetch('/api/upload', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            });
+            const uploadData = await uploadRes.json();
+            if (uploadData.url) {
+                finalPhotoUrl = uploadData.url;
+            }
+        } catch (e) {
+            alert("New photo upload failed.");
+            btn.disabled = false;
+            status.style.display = 'none';
+            return;
+        }
+    }
+
+    await fetch('/api/members', {
+        method: 'PUT',
+        headers: headers(),
+        body: JSON.stringify({ id, name, phone, paid_amount: paidAmount, photo_url: finalPhotoUrl })
+    });
+
+    btn.disabled = false;
+    status.style.display = 'none';
+    closeEditModal();
     loadMembers();
 };
 
