@@ -53,6 +53,23 @@ function loadAllData() {
 
 const headers = () => ({ 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' });
 
+// Helper to auto-calculate and set the next Member ID (+1 from the highest in database)
+function updateNextMemberNo() {
+    let nextId = 20230001;
+    if (Array.isArray(loadedMembersList) && loadedMembersList.length > 0) {
+        const validIds = loadedMembersList
+            .map(m => parseInt(m.membership_no, 10))
+            .filter(n => !isNaN(n) && n > 0);
+        if (validIds.length > 0) {
+            nextId = Math.max(...validIds) + 1;
+        }
+    }
+    const input = document.getElementById('new-member-no');
+    if (input) {
+        input.value = nextId;
+    }
+}
+
 // ==========================================
 // --- Member Photo 1:1 Cropping & Upload ---
 // ==========================================
@@ -173,54 +190,50 @@ window.clearNewMemberPhoto = function() {
 // --- Members CRUD (Add, Edit, Delete) ---
 // ==========================================
 async function loadMembers() {
-    const res = await fetch('/api/members');
-    const data = await res.json();
-    loadedMembersList = data || [];
+    try {
+        const res = await fetch('/api/members');
+        const data = await res.json();
+        loadedMembersList = Array.isArray(data) ? data : [];
 
-    // Auto-calculate next Member ID starting at 20230001
-    let nextId = 20230001;
-    if (loadedMembersList.length > 0) {
-        const maxId = Math.max(...loadedMembersList.map(m => parseInt(m.membership_no, 10) || 0));
-        if (maxId >= 20230001) nextId = maxId + 1;
+        // Pre-fill input with +1 of highest ID (starts at 20230001)
+        updateNextMemberNo();
+
+        const tbody = document.getElementById('members-list');
+        tbody.innerHTML = loadedMembersList.map((m, index) => {
+            const photoHtml = m.photo_url 
+                ? `<img src="${m.photo_url}" width="42" height="42" style="border-radius:50%; object-fit:cover; border:1px solid #D4AF37;">` 
+                : `<div style="width:42px; height:42px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; color:#888; font-size:1.1rem;">👤</div>`;
+            
+            const paidAmount = parseInt(m.paid_amount, 10) || 0;
+
+            // Payment status badge: Green if >= 3000, Red if < 3000
+            const paymentBadge = (paidAmount >= 3000)
+                ? `<span style="color: #27ae60; background: #eafaf1; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">₹${paidAmount.toLocaleString('en-IN')}</span>`
+                : `<span style="color: #c0392b; background: #fde8e8; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">₹${paidAmount.toLocaleString('en-IN')}</span>`;
+
+            let notesDisplay = m.notes || '<span style="color:#aaa;">-</span>';
+            if (m.notes && m.notes.length > 50) {
+                notesDisplay = `<span title="${m.notes}">${m.notes.substring(0, 50)}...</span>`;
+            }
+
+            return `
+                <tr>
+                    <td>${photoHtml}</td>
+                    <td><strong style="color: #800000;">${m.membership_no || '-'}</strong></td>
+                    <td><strong>${m.name}</strong></td>
+                    <td>${m.phone ? `📞 ${m.phone}` : '<span style="color:#aaa;">-</span>'}</td>
+                    <td style="font-size: 0.85rem; color: #555;">${notesDisplay}</td>
+                    <td>${paymentBadge}</td>
+                    <td style="text-align: center;">
+                        <button class="btn-edit" onclick="openEditMember(${index})">Edit</button>
+                        <button class="btn-delete" onclick="deleteItem('/api/members', ${m.id}, loadMembers)">Delete</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (err) {
+        console.error("Error loading members:", err);
     }
-    const newMemberNoInput = document.getElementById('new-member-no');
-    if (newMemberNoInput) {
-        newMemberNoInput.value = nextId;
-    }
-
-    const tbody = document.getElementById('members-list');
-    tbody.innerHTML = loadedMembersList.map((m, index) => {
-        const photoHtml = m.photo_url 
-            ? `<img src="${m.photo_url}" width="42" height="42" style="border-radius:50%; object-fit:cover; border:1px solid #D4AF37;">` 
-            : `<div style="width:42px; height:42px; border-radius:50%; background:#eee; display:flex; align-items:center; justify-content:center; color:#888; font-size:1.1rem;">👤</div>`;
-        
-        const paidAmount = parseInt(m.paid_amount, 10) || 0;
-
-        // Payment status badge in admin: Green if >= 3000, Red if < 3000
-        const paymentBadge = (paidAmount >= 3000)
-            ? `<span style="color: #27ae60; background: #eafaf1; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">₹${paidAmount.toLocaleString('en-IN')}</span>`
-            : `<span style="color: #c0392b; background: #fde8e8; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">₹${paidAmount.toLocaleString('en-IN')}</span>`;
-
-        let notesDisplay = m.notes || '<span style="color:#aaa;">-</span>';
-        if (m.notes && m.notes.length > 50) {
-            notesDisplay = `<span title="${m.notes}">${m.notes.substring(0, 50)}...</span>`;
-        }
-
-        return `
-            <tr>
-                <td>${photoHtml}</td>
-                <td><strong style="color: #800000;">${m.membership_no || '-'}</strong></td>
-                <td><strong>${m.name}</strong></td>
-                <td>${m.phone ? `📞 ${m.phone}` : '<span style="color:#aaa;">-</span>'}</td>
-                <td style="font-size: 0.85rem; color: #555;">${notesDisplay}</td>
-                <td>${paymentBadge}</td>
-                <td style="text-align: center;">
-                    <button class="btn-edit" onclick="openEditMember(${index})">Edit</button>
-                    <button class="btn-delete" onclick="deleteItem('/api/members', ${m.id}, loadMembers)">Delete</button>
-                </td>
-            </tr>
-        `;
-    }).join('');
 }
 
 // Add New Member
@@ -233,7 +246,7 @@ window.addMember = async function() {
     const btn = document.getElementById('btn-add-member');
     const status = document.getElementById('member-upload-status');
 
-    const memberNo = parseInt(noInput.value, 10) || 0;
+    const memberNo = parseInt(noInput.value, 10) || 20230001;
     const name = nameInput.value.trim();
     const phone = phoneInput.value.trim();
     const paidAmount = parseInt(paidInput.value, 10) || 0;
@@ -287,7 +300,9 @@ window.addMember = async function() {
     clearNewMemberPhoto();
     btn.disabled = false;
     status.style.display = 'none';
-    loadMembers();
+
+    // Reload list and automatically set next ID (+1) in the box
+    await loadMembers();
 };
 
 // Edit Member Modal Handlers
