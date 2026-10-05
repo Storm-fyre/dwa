@@ -164,7 +164,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // =========================================================
-    // PERMANENT MEMBERS DIRECTORY (PHOTO + PHONE + GREEN/RED AMOUNT)
+    // PERMANENT MEMBERS DIRECTORY
+    // (ORDERED BY MEMBER ID, WITH STATURE, SENTENCES, GREEN/RED)
     // =========================================================
     let allMembers = [];
     let filteredMembers = [];
@@ -183,8 +184,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             
             if (data && data.length > 0) {
-                // Sort with Telugu locale collation
-                allMembers = data.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'te')); 
+                // Strictly ordered by Member ID (First stays first, new appends to bottom)
+                allMembers = data.sort((a, b) => (parseInt(a.membership_no, 10) || 0) - (parseInt(b.membership_no, 10) || 0)); 
                 filteredMembers = [...allMembers];
                 
                 renderMemberChunk(true);
@@ -197,12 +198,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
 
+                // Live search across Name, Phone, Member ID, or Notes/Job/City
                 if (memberSearch) {
                     memberSearch.addEventListener('input', (e) => {
                         const query = e.target.value.toLowerCase().trim();
                         filteredMembers = allMembers.filter(m => 
                             (m.name && m.name.toLowerCase().includes(query)) ||
-                            (m.phone && m.phone.includes(query))
+                            (m.phone && m.phone.toLowerCase().includes(query)) ||
+                            (m.membership_no && String(m.membership_no).includes(query)) ||
+                            (m.notes && m.notes.toLowerCase().includes(query))
                         );
                         renderMemberChunk(true);
                     });
@@ -239,6 +243,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 ? `<img src="${member.photo_url}" alt="${member.name}" class="member-avatar" loading="lazy">` 
                 : `<div class="member-avatar-placeholder">👤</div>`;
 
+            // Member ID (Equal stature, bold, prominent)
+            const memberIdHtml = member.membership_no 
+                ? `<div class="member-id-tag">Member ID: ${member.membership_no}</div>` 
+                : '';
+
             // Phone number link
             const phoneHtml = member.phone ? `
                 <a href="tel:${member.phone.replace(/\s+/g, '')}" class="member-phone">
@@ -246,7 +255,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 </a>
             ` : '';
 
-            // Payment number: >= 3000 is GREEN, < 3000 is RED (No "Due" word)
+            // Notes / Sentence details (wraps gracefully)
+            const notesHtml = member.notes ? `
+                <div class="member-notes">${member.notes}</div>
+            ` : '';
+
+            // Payment number: >= 3000 is GREEN, < 3000 is RED (No "Due" or "Paid" word)
             const paid = parseInt(member.paid_amount, 10) || 0;
             const badgeClass = (paid >= 3000) ? 'member-paid-badge' : 'member-due-badge';
             const badgeHtml = `<span class="${badgeClass}">₹${paid.toLocaleString('en-IN')}</span>`;
@@ -254,8 +268,10 @@ document.addEventListener('DOMContentLoaded', function() {
             card.innerHTML = `
                 ${photoHtml}
                 <div class="member-info">
+                    ${memberIdHtml}
                     <p class="member-name">${member.name}</p>
                     ${phoneHtml}
+                    ${notesHtml}
                     ${badgeHtml}
                 </div>
             `;

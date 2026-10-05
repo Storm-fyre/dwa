@@ -20,17 +20,17 @@
     </script>
 
     <style>
-        .admin-wrapper { max-width: 950px; margin: 40px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .admin-wrapper { max-width: 1050px; margin: 40px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; flex-wrap: wrap; }
         .tab-btn { padding: 10px 20px; border: none; background: #eee; cursor: pointer; font-weight: bold; border-radius: 4px; }
         .tab-btn.active { background: #800000; color: #D4AF37; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .admin-table th, .admin-table td { padding: 12px; border: 1px solid #ddd; text-align: left; vertical-align: middle; }
-        .admin-table th { background-color: #f8f8f8; }
+        .admin-table th, .admin-table td { padding: 10px 12px; border: 1px solid #ddd; text-align: left; vertical-align: middle; }
+        .admin-table th { background-color: #f8f8f8; font-size: 0.9rem; }
         .admin-form { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: #f9f9f9; padding: 15px; border-radius: 5px; border-left: 4px solid #3498db; }
-        .admin-form input, .admin-form textarea { padding: 10px; border: 1px solid #ccc; border-radius: 4px; flex: 1; min-width: 180px; box-sizing: border-box; }
+        .admin-form input, .admin-form textarea { padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         .btn-add { background: #3498db; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; font-weight: bold; }
         .btn-edit { background: #f39c12; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-right: 5px; }
         .btn-edit:hover { background: #d68910; }
@@ -85,7 +85,7 @@
             z-index: 9990;
         }
 
-        /* CROPPER MODAL (Layer 10000 - ALWAYS ON TOP) */
+        /* CROPPER MODAL (Layer 10000 - ALWAYS POPS UP ON TOP) */
         #cropper-modal {
             z-index: 10000;
         }
@@ -94,13 +94,13 @@
             background: #fff;
             padding: 22px;
             border-radius: 8px;
-            max-width: 520px;
+            max-width: 540px;
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             box-shadow: 0 6px 25px rgba(0,0,0,0.6);
-            max-height: 90vh;
+            max-height: 92vh;
             overflow-y: auto;
         }
         .cropper-image-wrapper {
@@ -168,9 +168,28 @@
             <h2>Manage Permanent Members</h2>
             <div class="admin-form" style="flex-direction: column;">
                 <div style="display: flex; gap: 10px; flex-wrap: wrap; width: 100%;">
-                    <input type="text" id="new-member-name" placeholder="Member Name (e.g., Ashok Sirsi గారు)" style="flex: 2;">
-                    <input type="tel" id="new-member-phone" placeholder="Phone Number (e.g., 9849797360)" style="flex: 1.5;">
-                    <input type="number" id="new-member-paid" placeholder="Amount Paid (₹) - e.g. 5000 or 1000" min="0" style="flex: 1.5;">
+                    <div style="flex: 1; min-width: 140px;">
+                        <label style="font-size: 0.85rem; font-weight: bold; color: #555;">Member ID:</label>
+                        <input type="number" id="new-member-no" placeholder="e.g. 20230001" style="width: 100%;">
+                    </div>
+                    <div style="flex: 2; min-width: 200px;">
+                        <label style="font-size: 0.85rem; font-weight: bold; color: #555;">Member Name:</label>
+                        <input type="text" id="new-member-name" placeholder="Member Name" style="width: 100%;">
+                    </div>
+                    <div style="flex: 1.5; min-width: 160px;">
+                        <label style="font-size: 0.85rem; font-weight: bold; color: #555;">Phone Number:</label>
+                        <input type="tel" id="new-member-phone" placeholder="Phone Number" style="width: 100%;">
+                    </div>
+                    <div style="flex: 1.2; min-width: 140px;">
+                        <label style="font-size: 0.85rem; font-weight: bold; color: #555;">Amount Paid (₹):</label>
+                        <input type="number" id="new-member-paid" placeholder="e.g. 5000" min="0" style="width: 100%;">
+                    </div>
+                </div>
+
+                <!-- NOTES TEXTAREA (Handles complete sentences comfortably) -->
+                <div style="width: 100%;">
+                    <label style="font-size: 0.85rem; font-weight: bold; color: #555;">Notes / Details (Job, Native Place, Sentences):</label>
+                    <textarea id="new-member-notes" rows="2" placeholder="e.g., Working as Senior Architect at Tech Mahindra. Living in Madinaguda, Hyderabad. Native of Tenali." style="width: 100%; min-height: 60px; resize: vertical;"></textarea>
                 </div>
 
                 <!-- 1:1 SQUARE PHOTO CROPPER SELECTOR -->
@@ -198,10 +217,12 @@
             <table class="admin-table">
                 <thead>
                     <tr>
-                        <th style="width: 60px;">Photo</th>
+                        <th style="width: 55px;">Photo</th>
+                        <th style="width: 120px;">Member ID</th>
                         <th>Name</th>
                         <th>Phone</th>
-                        <th>Payment Status</th>
+                        <th>Notes / Details</th>
+                        <th style="width: 100px;">Paid</th>
                         <th style="width: 140px; text-align: center;">Actions</th>
                     </tr>
                 </thead>
@@ -263,16 +284,34 @@
             <h3 style="margin: 0; color: #800000;">Edit Permanent Member</h3>
             <input type="hidden" id="edit-member-id">
             
-            <label style="font-weight: bold; font-size: 0.9rem;">Member Name:</label>
-            <input type="text" id="edit-member-name" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 130px;">
+                    <label style="font-weight: bold; font-size: 0.85rem;">Member ID:</label>
+                    <input type="number" id="edit-member-no" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                <div style="flex: 2; min-width: 200px;">
+                    <label style="font-weight: bold; font-size: 0.85rem;">Member Name:</label>
+                    <input type="text" id="edit-member-name" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+            </div>
 
-            <label style="font-weight: bold; font-size: 0.9rem;">Phone Number:</label>
-            <input type="tel" id="edit-member-phone" placeholder="Phone Number" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <div style="flex: 1.5; min-width: 160px;">
+                    <label style="font-weight: bold; font-size: 0.85rem;">Phone Number:</label>
+                    <input type="tel" id="edit-member-phone" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+                <div style="flex: 1; min-width: 130px;">
+                    <label style="font-weight: bold; font-size: 0.85rem;">Amount Paid (₹):</label>
+                    <input type="number" id="edit-member-paid" min="0" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+            </div>
 
-            <label style="font-weight: bold; font-size: 0.9rem;">Amount Paid (₹):</label>
-            <input type="number" id="edit-member-paid" placeholder="Amount Paid" min="0" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+            <div>
+                <label style="font-weight: bold; font-size: 0.85rem;">Notes / Details (Job, Native Place, Sentences):</label>
+                <textarea id="edit-member-notes" rows="3" style="width: 100%; min-height: 70px; padding: 8px; border: 1px solid #ccc; border-radius: 4px; resize: vertical; box-sizing: border-box;"></textarea>
+            </div>
 
-            <label style="font-weight: bold; font-size: 0.9rem;">Member Photo:</label>
+            <label style="font-weight: bold; font-size: 0.85rem;">Member Photo:</label>
             <div style="display: flex; align-items: center; justify-content: space-between; background: #fafafa; padding: 10px 14px; border-radius: 4px; border: 1px solid #eee;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <img id="edit-member-photo-preview" src="" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #D4AF37;">
@@ -292,7 +331,7 @@
         </div>
     </div>
 
-    <!-- 1:1 SQUARE CROPPER MODAL (Layer 10000 - POPS UP IN FRONT) -->
+    <!-- 1:1 SQUARE CROPPER MODAL (Layer 10000 - POPS UP ON TOP) -->
     <div id="cropper-modal" class="admin-modal-overlay">
         <div class="modal-box">
             <h3 style="margin: 0; color: #800000;">Crop Photo (Locked 1:1 Square)</h3>

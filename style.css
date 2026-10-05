@@ -235,9 +235,9 @@ a:hover {
 /* Grid & Cards for Permanent Members */
 .members-grid-scrollable {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 12px;
-    max-height: 460px;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 14px;
+    max-height: 480px;
     overflow-y: auto;
     padding: 16px;
     background: #fdfdfd;
@@ -245,9 +245,9 @@ a:hover {
 
 .member-card {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 14px;
-    padding: 12px 14px;
+    padding: 14px;
     background-color: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
@@ -269,6 +269,7 @@ a:hover {
     border: 2px solid #D4AF37;
     flex-shrink: 0;
     background-color: #fafafa;
+    margin-top: 2px;
 }
 
 .member-avatar-placeholder {
@@ -283,20 +284,30 @@ a:hover {
     font-size: 1.5rem;
     color: #888;
     flex-shrink: 0;
+    margin-top: 2px;
 }
 
 .member-info {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     overflow: hidden;
     flex-grow: 1;
+}
+
+/* Member ID: Equal Stature, Bold & Prominent */
+.member-id-tag {
+    font-size: 0.95em;
+    font-weight: bold;
+    color: #800000;
+    letter-spacing: 0.3px;
+    margin-bottom: 2px;
 }
 
 .member-name {
     margin: 0;
     font-weight: bold;
-    font-size: 0.98em;
+    font-size: 1.05em;
     color: #2c3e50;
     line-height: 1.35;
     word-break: break-word;
@@ -319,17 +330,32 @@ a:hover {
     text-decoration: underline;
 }
 
+/* Multi-line Notes (Handles Full Sentences) */
+.member-notes {
+    font-size: 0.86em;
+    color: #555;
+    line-height: 1.5;
+    margin: 5px 0 6px 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
+    background-color: #fafafa;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border-left: 2px solid #D4AF37;
+}
+
 /* Payment Status Badges (Green for >= 3000, Red for < 3000) */
 .member-paid-badge {
     display: inline-block;
     align-self: flex-start;
-    margin-top: 5px;
+    margin-top: 4px;
     padding: 2px 10px;
     background-color: #eafaf1;
     color: #27ae60;
     border: 1px solid #b7eb8f;
     border-radius: 12px;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     font-weight: bold;
     letter-spacing: 0.3px;
 }
@@ -337,13 +363,13 @@ a:hover {
 .member-due-badge {
     display: inline-block;
     align-self: flex-start;
-    margin-top: 5px;
+    margin-top: 4px;
     padding: 2px 10px;
     background-color: #fde8e8;
     color: #c0392b;
     border: 1px solid #f8b4b4;
     border-radius: 12px;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     font-weight: bold;
     letter-spacing: 0.3px;
 }
@@ -910,11 +936,11 @@ a:hover {
         gap: 10px;
     }
     .member-card {
-        padding: 10px 12px;
+        padding: 12px;
     }
     .member-avatar,
     .member-avatar-placeholder {
-        width: 50px;
-        height: 50px;
+        width: 52px;
+        height: 52px;
     }
 }

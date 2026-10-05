@@ -85,7 +85,7 @@ memberPhotoInput.addEventListener('change', (e) => {
     const reader = new FileReader();
     reader.onload = (event) => {
         cropperModalImage.src = event.target.result;
-        cropperModal.style.display = 'flex'; // Opens in front with z-index: 10000
+        cropperModal.style.display = 'flex'; // Pops up in front (z-index: 10000)
 
         if (memberCropper) {
             memberCropper.destroy();
@@ -153,7 +153,7 @@ window.applyCrop = function() {
                     }
                 }
                 
-                cancelCrop(); // Closes cropper modal, smoothly revealing Edit modal underneath
+                cancelCrop(); // Closes cropper, revealing Edit window smoothly underneath
             },
             error(err) {
                 alert("Error optimizing photo: " + err.message);
@@ -177,6 +177,17 @@ async function loadMembers() {
     const data = await res.json();
     loadedMembersList = data || [];
 
+    // Auto-calculate next Member ID starting at 20230001
+    let nextId = 20230001;
+    if (loadedMembersList.length > 0) {
+        const maxId = Math.max(...loadedMembersList.map(m => parseInt(m.membership_no, 10) || 0));
+        if (maxId >= 20230001) nextId = maxId + 1;
+    }
+    const newMemberNoInput = document.getElementById('new-member-no');
+    if (newMemberNoInput) {
+        newMemberNoInput.value = nextId;
+    }
+
     const tbody = document.getElementById('members-list');
     tbody.innerHTML = loadedMembersList.map((m, index) => {
         const photoHtml = m.photo_url 
@@ -190,11 +201,18 @@ async function loadMembers() {
             ? `<span style="color: #27ae60; background: #eafaf1; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">₹${paidAmount.toLocaleString('en-IN')}</span>`
             : `<span style="color: #c0392b; background: #fde8e8; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">₹${paidAmount.toLocaleString('en-IN')}</span>`;
 
+        let notesDisplay = m.notes || '<span style="color:#aaa;">-</span>';
+        if (m.notes && m.notes.length > 50) {
+            notesDisplay = `<span title="${m.notes}">${m.notes.substring(0, 50)}...</span>`;
+        }
+
         return `
             <tr>
                 <td>${photoHtml}</td>
+                <td><strong style="color: #800000;">${m.membership_no || '-'}</strong></td>
                 <td><strong>${m.name}</strong></td>
                 <td>${m.phone ? `📞 ${m.phone}` : '<span style="color:#aaa;">-</span>'}</td>
+                <td style="font-size: 0.85rem; color: #555;">${notesDisplay}</td>
                 <td>${paymentBadge}</td>
                 <td style="text-align: center;">
                     <button class="btn-edit" onclick="openEditMember(${index})">Edit</button>
@@ -207,15 +225,19 @@ async function loadMembers() {
 
 // Add New Member
 window.addMember = async function() {
+    const noInput = document.getElementById('new-member-no');
     const nameInput = document.getElementById('new-member-name');
     const phoneInput = document.getElementById('new-member-phone');
     const paidInput = document.getElementById('new-member-paid');
+    const notesInput = document.getElementById('new-member-notes');
     const btn = document.getElementById('btn-add-member');
     const status = document.getElementById('member-upload-status');
 
+    const memberNo = parseInt(noInput.value, 10) || 0;
     const name = nameInput.value.trim();
     const phone = phoneInput.value.trim();
     const paidAmount = parseInt(paidInput.value, 10) || 0;
+    const notes = notesInput.value.trim();
 
     if (!name) return alert("Please enter the member's name");
 
@@ -248,12 +270,20 @@ window.addMember = async function() {
     await fetch('/api/members', {
         method: 'POST',
         headers: headers(),
-        body: JSON.stringify({ name, phone, paid_amount: paidAmount, photo_url: photoUrl })
+        body: JSON.stringify({ 
+            membership_no: memberNo,
+            name, 
+            phone, 
+            paid_amount: paidAmount, 
+            notes, 
+            photo_url: photoUrl 
+        })
     });
 
     nameInput.value = '';
     phoneInput.value = '';
     paidInput.value = '';
+    notesInput.value = '';
     clearNewMemberPhoto();
     btn.disabled = false;
     status.style.display = 'none';
@@ -268,9 +298,11 @@ window.openEditMember = function(index) {
     if (!member) return;
 
     document.getElementById('edit-member-id').value = member.id;
+    document.getElementById('edit-member-no').value = member.membership_no || '';
     document.getElementById('edit-member-name').value = member.name || '';
     document.getElementById('edit-member-phone').value = member.phone || '';
     document.getElementById('edit-member-paid').value = member.paid_amount || 0;
+    document.getElementById('edit-member-notes').value = member.notes || '';
 
     editMemberExistingPhotoUrl = member.photo_url || '';
     croppedEditMemberFile = null;
@@ -297,9 +329,11 @@ window.closeEditModal = function() {
 // Save Edited Member
 window.updateMember = async function() {
     const id = document.getElementById('edit-member-id').value;
+    const memberNo = parseInt(document.getElementById('edit-member-no').value, 10) || 20230001;
     const name = document.getElementById('edit-member-name').value.trim();
     const phone = document.getElementById('edit-member-phone').value.trim();
     const paidAmount = parseInt(document.getElementById('edit-member-paid').value, 10) || 0;
+    const notes = document.getElementById('edit-member-notes').value.trim();
     const btn = document.getElementById('btn-save-member-edit');
     const status = document.getElementById('edit-upload-status');
 
@@ -310,7 +344,6 @@ window.updateMember = async function() {
 
     let finalPhotoUrl = editMemberExistingPhotoUrl;
 
-    // If admin cropped a new photo for this member
     if (croppedEditMemberFile) {
         const formData = new FormData();
         formData.append('image', croppedEditMemberFile);
@@ -335,7 +368,15 @@ window.updateMember = async function() {
     await fetch('/api/members', {
         method: 'PUT',
         headers: headers(),
-        body: JSON.stringify({ id, name, phone, paid_amount: paidAmount, photo_url: finalPhotoUrl })
+        body: JSON.stringify({ 
+            id, 
+            membership_no: memberNo,
+            name, 
+            phone, 
+            paid_amount: paidAmount, 
+            notes, 
+            photo_url: finalPhotoUrl 
+        })
     });
 
     btn.disabled = false;

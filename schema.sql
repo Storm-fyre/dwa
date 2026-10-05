@@ -1,9 +1,11 @@
 DROP TABLE IF EXISTS members;
 CREATE TABLE members (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    membership_no INTEGER DEFAULT 0,
     name TEXT NOT NULL,
     phone TEXT DEFAULT '',
     photo_url TEXT DEFAULT '',
+    notes TEXT DEFAULT '',
     paid_amount INTEGER DEFAULT 0,
     due_amount INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

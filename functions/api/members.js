@@ -3,10 +3,12 @@ function isAuthenticated(request) {
   return request.headers.get("Authorization") === `Bearer ${SECRET_TOKEN}`; 
 }
 
-// GET all members sorted alphabetically
+// GET all members strictly sorted by Member ID (First stays first)
 export async function onRequestGet(context) {
   try {
-    const { results } = await context.env.DB.prepare("SELECT * FROM members ORDER BY name ASC").all();
+    const { results } = await context.env.DB.prepare(
+      "SELECT * FROM members ORDER BY CAST(membership_no AS INTEGER) ASC, id ASC"
+    ).all();
     return new Response(JSON.stringify(results), { 
       headers: { "Content-Type": "application/json" } 
     });
@@ -20,15 +22,28 @@ export async function onRequestPost(context) {
   if (!isAuthenticated(context.request)) return new Response("Unauthorized", { status: 401 });
   try {
     const data = await context.request.json();
+    
+    // Auto-calculate next Membership Number if not provided
+    let memberNo = parseInt(data.membership_no, 10);
+    if (!memberNo || memberNo <= 0) {
+      const { results } = await context.env.DB.prepare(
+        "SELECT MAX(CAST(membership_no AS INTEGER)) as max_no FROM members"
+      ).all();
+      const currentMax = results[0]?.max_no || 0;
+      memberNo = currentMax >= 20230001 ? currentMax + 1 : 20230001;
+    }
+
     const paidAmount = parseInt(data.paid_amount, 10) || 0;
     const dueAmount = Math.max(0, 3000 - paidAmount);
     const phone = data.phone ? data.phone.trim() : "";
+    const notes = data.notes ? data.notes.trim() : "";
 
     await context.env.DB.prepare(
-      "INSERT INTO members (name, phone, photo_url, paid_amount, due_amount) VALUES (?, ?, ?, ?, ?)"
-    ).bind(data.name.trim(), phone, data.photo_url || "", paidAmount, dueAmount).run();
+      `INSERT INTO members (membership_no, name, phone, photo_url, notes, paid_amount, due_amount) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)`
+    ).bind(memberNo, data.name.trim(), phone, data.photo_url || "", notes, paidAmount, dueAmount).run();
 
-    return new Response(JSON.stringify({ success: true }));
+    return new Response(JSON.stringify({ success: true, membership_no: memberNo }));
   } catch (error) { 
     return new Response(JSON.stringify({ error: error.message }), { status: 500 }); 
   }
@@ -42,11 +57,13 @@ export async function onRequestPut(context) {
     const id = data.id;
     if (!id) return new Response(JSON.stringify({ error: "Member ID required" }), { status: 400 });
 
+    const memberNo = parseInt(data.membership_no, 10) || 20230001;
     const paidAmount = parseInt(data.paid_amount, 10) || 0;
     const dueAmount = Math.max(0, 3000 - paidAmount);
     const phone = data.phone ? data.phone.trim() : "";
+    const notes = data.notes ? data.notes.trim() : "";
 
-    // If photo was changed, optionally clean up old photo from R2
+    // Clean up replaced photo from R2 if new photo was uploaded
     const { results } = await context.env.DB.prepare("SELECT photo_url FROM members WHERE id = ?").bind(id).all();
     if (results.length > 0 && results[0].photo_url && data.photo_url && results[0].photo_url !== data.photo_url) {
       try {
@@ -59,8 +76,10 @@ export async function onRequestPut(context) {
     }
 
     await context.env.DB.prepare(
-      "UPDATE members SET name = ?, phone = ?, photo_url = ?, paid_amount = ?, due_amount = ? WHERE id = ?"
-    ).bind(data.name.trim(), phone, data.photo_url || "", paidAmount, dueAmount, id).run();
+      `UPDATE members 
+       SET membership_no = ?, name = ?, phone = ?, photo_url = ?, notes = ?, paid_amount = ?, due_amount = ? 
+       WHERE id = ?`
+    ).bind(memberNo, data.name.trim(), phone, data.photo_url || "", notes, paidAmount, dueAmount, id).run();
 
     return new Response(JSON.stringify({ success: true }));
   } catch (error) {
@@ -75,7 +94,7 @@ export async function onRequestDelete(context) {
     const url = new URL(context.request.url);
     const id = url.searchParams.get('id');
 
-    // Clean up photo from R2 if member had an image
+    // Clean up photo from R2 if member has an image
     const { results } = await context.env.DB.prepare("SELECT photo_url FROM members WHERE id = ?").bind(id).all();
     if (results.length > 0 && results[0].photo_url) {
       try {
