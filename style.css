@@ -235,69 +235,81 @@ a:hover {
 /* Grid & Cards for Permanent Members */
 .members-grid-scrollable {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
     gap: 14px;
-    max-height: 480px;
+    max-height: 520px;
     overflow-y: auto;
     padding: 16px;
     background: #fdfdfd;
 }
 
+/* REDESIGNED MEMBER CARD: Full-Height Photo + Interactive Click */
 .member-card {
     display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    padding: 14px;
+    align-items: stretch; /* Photo takes full vertical height */
+    padding: 0; /* Clean flush edge for photo */
     background-color: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
     transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    min-height: 115px;
 }
 
 .member-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.09);
     border-color: #D4AF37;
 }
 
-.member-avatar {
-    width: 58px;
-    height: 58px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #D4AF37;
-    flex-shrink: 0;
-    background-color: #fafafa;
-    margin-top: 2px;
-}
-
-.member-avatar-placeholder {
-    width: 58px;
-    height: 58px;
-    border-radius: 50%;
-    background-color: #f2f2f2;
-    border: 2px solid #ddd;
+/* Left Photo Wrap - Expands to entire height */
+.member-photo-left {
+    width: 105px;
+    min-width: 105px;
+    max-width: 105px;
+    align-self: stretch;
+    background-color: #f5f5f5;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
-    color: #888;
+    border-right: 1px solid #eee;
     flex-shrink: 0;
-    margin-top: 2px;
+    position: relative;
+}
+
+.member-panel-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.member-panel-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    color: #aaa;
+    background-color: #f0f0f0;
 }
 
 .member-info {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
+    padding: 10px 14px;
     overflow: hidden;
     flex-grow: 1;
 }
 
 /* Member ID: Equal Stature, Bold & Prominent */
 .member-id-tag {
-    font-size: 0.95em;
+    font-size: 0.9em;
     font-weight: bold;
     color: #800000;
     letter-spacing: 0.3px;
@@ -309,7 +321,7 @@ a:hover {
     font-weight: bold;
     font-size: 1.05em;
     color: #2c3e50;
-    line-height: 1.35;
+    line-height: 1.3;
     word-break: break-word;
 }
 
@@ -330,48 +342,49 @@ a:hover {
     text-decoration: underline;
 }
 
-/* Multi-line Notes (Handles Full Sentences) */
+/* Notes preview in card */
 .member-notes {
-    font-size: 0.86em;
-    color: #555;
-    line-height: 1.5;
-    margin: 5px 0 6px 0;
-    overflow-wrap: break-word;
-    word-break: break-word;
-    white-space: pre-wrap;
+    font-size: 0.83em;
+    color: #666;
+    line-height: 1.4;
+    margin: 4px 0 5px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2; /* <-- Adding this satisfies VS Code's validator */
+    -webkit-box-orient: vertical;
     background-color: #fafafa;
-    padding: 4px 8px;
+    padding: 3px 6px;
     border-radius: 4px;
     border-left: 2px solid #D4AF37;
 }
 
-/* Payment Status Badges (Green for >= 3000, Red for < 3000) */
+/* Payment Status Badges */
 .member-paid-badge {
     display: inline-block;
     align-self: flex-start;
-    margin-top: 4px;
-    padding: 2px 10px;
+    margin-top: 3px;
+    padding: 2px 8px;
     background-color: #eafaf1;
     color: #27ae60;
     border: 1px solid #b7eb8f;
     border-radius: 12px;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     font-weight: bold;
-    letter-spacing: 0.3px;
 }
 
 .member-due-badge {
     display: inline-block;
     align-self: flex-start;
-    margin-top: 4px;
-    padding: 2px 10px;
+    margin-top: 3px;
+    padding: 2px 8px;
     background-color: #fde8e8;
     color: #c0392b;
     border: 1px solid #f8b4b4;
     border-radius: 12px;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     font-weight: bold;
-    letter-spacing: 0.3px;
 }
 
 /* Custom Scrollbar for Directory */
@@ -387,6 +400,176 @@ a:hover {
 }
 .members-grid-scrollable::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8; 
+}
+
+/* ================= EXPANDED MEMBER PROFILE MODAL ================= */
+.member-detail-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.78);
+    backdrop-filter: blur(4px);
+    z-index: 3000;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.member-detail-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 440px;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    position: relative;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    animation: memberModalPop 0.22s ease-out;
+}
+
+@keyframes memberModalPop {
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.member-modal-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.55);
+    color: #ffffff;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: background-color 0.2s;
+}
+
+.member-modal-close-btn:hover {
+    background: rgba(0, 0, 0, 0.85);
+}
+
+.member-modal-photo-wrap {
+    width: 100%;
+    background-color: #2b2b2b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 0 16px 0;
+    border-bottom: 3px solid #D4AF37;
+}
+
+.member-modal-photo {
+    width: 180px;
+    height: 180px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 3px solid #D4AF37;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    background: #fff;
+    display: block;
+}
+
+.member-modal-placeholder {
+    width: 180px;
+    height: 180px;
+    border-radius: 12px;
+    background: #3a3a3a;
+    border: 3px solid #D4AF37;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    color: #888;
+}
+
+.member-modal-body {
+    padding: 20px 22px;
+    overflow-y: auto;
+    text-align: center;
+}
+
+.member-modal-id {
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #800000;
+    letter-spacing: 0.5px;
+}
+
+.member-modal-name {
+    margin: 5px 0 8px 0;
+    font-size: 1.45rem;
+    color: #2c3e50;
+    line-height: 1.3;
+}
+
+/* Call Button */
+.member-modal-call-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #27ae60;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 1.05rem;
+    padding: 10px 24px;
+    border-radius: 25px;
+    text-decoration: none;
+    box-shadow: 0 3px 8px rgba(39, 174, 96, 0.35);
+    transition: transform 0.15s, background-color 0.15s;
+}
+
+.member-modal-call-btn:hover {
+    background-color: #219653;
+    color: #ffffff;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.member-modal-notes-box {
+    margin-top: 18px;
+    background: #f8f9fa;
+    border-left: 4px solid #D4AF37;
+    border-radius: 6px;
+    padding: 12px 14px;
+    text-align: left;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+}
+
+.notes-heading {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #800000;
+    margin-bottom: 5px;
+}
+
+.notes-text {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 /* ================= ABOUT TRUST / OBJECTIVES SECTION ================= */
@@ -935,12 +1118,12 @@ a:hover {
         padding: 10px;
         gap: 10px;
     }
-    .member-card {
-        padding: 12px;
+    .member-photo-left {
+        width: 95px;
+        min-width: 95px;
     }
-    .member-avatar,
-    .member-avatar-placeholder {
-        width: 52px;
-        height: 52px;
+    .member-modal-photo {
+        width: 150px;
+        height: 150px;
     }
 }

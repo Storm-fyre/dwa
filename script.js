@@ -165,7 +165,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // =========================================================
     // PERMANENT MEMBERS DIRECTORY
-    // (ORDERED BY MEMBER ID, WITH STATURE, SENTENCES, GREEN/RED)
     // =========================================================
     let allMembers = [];
     let filteredMembers = [];
@@ -184,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             
             if (data && data.length > 0) {
-                // Strictly ordered by Member ID (First stays first, new appends to bottom)
+                // Ordered by Member ID
                 allMembers = data.sort((a, b) => (parseInt(a.membership_no, 10) || 0) - (parseInt(b.membership_no, 10) || 0)); 
                 filteredMembers = [...allMembers];
                 
@@ -198,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 });
 
-                // Live search across Name, Phone, Member ID, or Notes/Job/City
+                // Live search across Name, Phone, Member ID, or Notes
                 if (memberSearch) {
                     memberSearch.addEventListener('input', (e) => {
                         const query = e.target.value.toLowerCase().trim();
@@ -237,30 +236,31 @@ document.addEventListener('DOMContentLoaded', function() {
         chunk.forEach(member => {
             const card = document.createElement('div');
             card.className = 'member-card';
+            card.setAttribute('title', 'Tap to view full member details');
 
-            // Member photo or clean fallback silhouette
+            // Left photo taking the entire vertical height
             const photoHtml = member.photo_url 
-                ? `<img src="${member.photo_url}" alt="${member.name}" class="member-avatar" loading="lazy">` 
-                : `<div class="member-avatar-placeholder">👤</div>`;
+                ? `<div class="member-photo-left"><img src="${member.photo_url}" alt="${member.name}" class="member-panel-photo" loading="lazy"></div>` 
+                : `<div class="member-photo-left"><div class="member-panel-placeholder">👤</div></div>`;
 
-            // Member ID (Equal stature, bold, prominent)
+            // Member ID
             const memberIdHtml = member.membership_no 
                 ? `<div class="member-id-tag">Member ID: ${member.membership_no}</div>` 
                 : '';
 
-            // Phone number link
+            // Phone link inside card
             const phoneHtml = member.phone ? `
-                <a href="tel:${member.phone.replace(/\s+/g, '')}" class="member-phone">
+                <a href="tel:${member.phone.replace(/\s+/g, '')}" class="member-phone" onclick="event.stopPropagation();">
                     <span>📞</span> ${member.phone}
                 </a>
             ` : '';
 
-            // Notes / Sentence details (wraps gracefully)
+            // Notes / details preview
             const notesHtml = member.notes ? `
                 <div class="member-notes">${member.notes}</div>
             ` : '';
 
-            // Payment number: >= 3000 is GREEN, < 3000 is RED (No "Due" or "Paid" word)
+            // Payment badge
             const paid = parseInt(member.paid_amount, 10) || 0;
             const badgeClass = (paid >= 3000) ? 'member-paid-badge' : 'member-due-badge';
             const badgeHtml = `<span class="${badgeClass}">₹${paid.toLocaleString('en-IN')}</span>`;
@@ -275,12 +275,103 @@ document.addEventListener('DOMContentLoaded', function() {
                     ${badgeHtml}
                 </div>
             `;
+
+            // OPEN EXPANDED PROFILE ON TAP
+            card.addEventListener('click', () => {
+                openMemberDetailModal(member);
+            });
+
             fragment.appendChild(card);
         });
 
         membersContainer.appendChild(fragment);
         displayedCount += chunk.length;
     }
+
+    // =========================================================
+    // EXPANDED MEMBER DETAIL MODAL LOGIC
+    // =========================================================
+    const memberModal = document.getElementById('memberDetailModal');
+    const closeMemberModalBtn = document.getElementById('closeMemberModalBtn');
+    const modalMemberPhoto = document.getElementById('modalMemberPhoto');
+    const modalMemberPlaceholder = document.getElementById('modalMemberPlaceholder');
+    const modalMemberId = document.getElementById('modalMemberId');
+    const modalMemberName = document.getElementById('modalMemberName');
+    const modalMemberBadge = document.getElementById('modalMemberBadge');
+    const modalPhoneContainer = document.getElementById('modalPhoneContainer');
+    const modalMemberPhoneBtn = document.getElementById('modalMemberPhoneBtn');
+    const modalNotesSection = document.getElementById('modalNotesSection');
+    const modalMemberNotes = document.getElementById('modalMemberNotes');
+
+    function openMemberDetailModal(member) {
+        if (!memberModal) return;
+
+        // Photo setup
+        if (member.photo_url) {
+            modalMemberPhoto.src = member.photo_url;
+            modalMemberPhoto.style.display = 'block';
+            modalMemberPlaceholder.style.display = 'none';
+        } else {
+            modalMemberPhoto.style.display = 'none';
+            modalMemberPlaceholder.style.display = 'flex';
+        }
+
+        // Member ID & Name
+        modalMemberId.textContent = member.membership_no ? `Member ID: ${member.membership_no}` : '';
+        modalMemberName.textContent = member.name || 'Member';
+
+        // Payment status badge
+        const paid = parseInt(member.paid_amount, 10) || 0;
+        const badgeClass = (paid >= 3000) ? 'member-paid-badge' : 'member-due-badge';
+        modalMemberBadge.innerHTML = `<span class="${badgeClass}">₹${paid.toLocaleString('en-IN')}</span>`;
+
+        // Direct phone call button
+        if (member.phone) {
+            const cleanPhone = member.phone.replace(/\s+/g, '');
+            modalMemberPhoneBtn.href = `tel:${cleanPhone}`;
+            modalMemberPhoneBtn.textContent = `📞 Call ${member.phone}`;
+            modalPhoneContainer.style.display = 'block';
+        } else {
+            modalPhoneContainer.style.display = 'none';
+        }
+
+        // Full Notes / details block
+        if (member.notes && member.notes.trim()) {
+            modalMemberNotes.textContent = member.notes;
+            modalNotesSection.style.display = 'block';
+        } else {
+            modalNotesSection.style.display = 'none';
+        }
+
+        memberModal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Stop background page scroll
+    }
+
+    function closeMemberDetailModal() {
+        if (!memberModal) return;
+        memberModal.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Restore background scroll
+    }
+
+    if (closeMemberModalBtn) {
+        closeMemberModalBtn.addEventListener('click', closeMemberDetailModal);
+    }
+
+    // Close when tapping the dark background overlay
+    if (memberModal) {
+        memberModal.addEventListener('click', function(e) {
+            if (e.target === memberModal) {
+                closeMemberDetailModal();
+            }
+        });
+    }
+
+    // Close on 'Escape' keyboard key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && memberModal && memberModal.style.display === 'flex') {
+            closeMemberDetailModal();
+        }
+    });
 
     // =========================================================
     // LOAD EVENTS
@@ -383,7 +474,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Modal behavior
+    // Modal behavior for files
     const fileModal = document.getElementById('fileModal');
     const pdfViewer = document.getElementById('filePdfViewer');
     const imgViewer = document.getElementById('fileImageViewer');

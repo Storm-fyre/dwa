@@ -70,14 +70,14 @@
             </a>
         </div>
 
-        <!-- PERMANENT MEMBERS SECTION (PLACED PROMINENTLY BETWEEN MATRIMONY & ABOUT SECTIONS) -->
+        <!-- PERMANENT MEMBERS SECTION -->
         <section id="members" class="content-section permanent-members-featured">
             <h2 style="text-transform: uppercase; text-align: center; margin-bottom: 5px;">PERMANENT MEMBERS</h2>
             <p class="membership-fee" style="text-align: center;"><em>(Entry Fee: ₹3,000 | Monthly Subscription: ₹100)</em></p>
             
             <div class="directory-wrapper">
                 <!-- Sticky Search Bar -->
-                <input type="text" id="memberSearch" placeholder="Search member by name..." class="member-search-input" />
+                <input type="text" id="memberSearch" placeholder="Search member by name, phone, ID, or notes..." class="member-search-input" />
                 
                 <!-- Scrollable Directory Grid Container -->
                 <div class="members-grid-scrollable" id="membersContainer">
@@ -246,7 +246,39 @@
         </footer>
     </div>
 
-    <!-- File Modal -->
+    <!-- EXPANDED MEMBER PROFILE MODAL -->
+    <div id="memberDetailModal" class="member-detail-modal-overlay">
+        <div class="member-detail-card">
+            <button class="member-modal-close-btn" id="closeMemberModalBtn" title="Close Profile">&times;</button>
+            
+            <div class="member-modal-photo-wrap">
+                <img id="modalMemberPhoto" src="" alt="Member Photo" class="member-modal-photo" />
+                <div id="modalMemberPlaceholder" class="member-modal-placeholder">👤</div>
+            </div>
+
+            <div class="member-modal-body">
+                <div id="modalMemberId" class="member-modal-id"></div>
+                <h2 id="modalMemberName" class="member-modal-name"></h2>
+                
+                <div id="modalMemberBadge" style="margin-top: 4px;"></div>
+
+                <!-- One-Tap Direct Call Button -->
+                <div id="modalPhoneContainer" style="margin-top: 15px;">
+                    <a id="modalMemberPhoneBtn" href="" class="member-modal-call-btn">
+                        📞 Call Member
+                    </a>
+                </div>
+
+                <!-- Complete Notes / Details -->
+                <div id="modalNotesSection" class="member-modal-notes-box">
+                    <span class="notes-heading">Member Details / Profile:</span>
+                    <p id="modalMemberNotes" class="notes-text"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event & File Viewer Modal -->
     <div id="fileModal" class="pdf-modal">
         <div class="pdf-modal-content">
             <span class="pdf-close">&times;</span>
