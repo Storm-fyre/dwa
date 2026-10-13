@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
             card.className = 'member-card';
             card.setAttribute('title', 'Tap to view full member details');
 
-            // Left photo taking the entire vertical height
+            // Left photo badge
             const photoHtml = member.photo_url 
                 ? `<div class="member-photo-left"><img src="${member.photo_url}" alt="${member.name}" class="member-panel-photo" loading="lazy"></div>` 
                 : `<div class="member-photo-left"><div class="member-panel-placeholder">👤</div></div>`;
@@ -248,11 +248,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 ? `<div class="member-id-tag">Member ID: ${member.membership_no}</div>` 
                 : '';
 
-            // Phone link inside card
+            // Phone text display (100% identical look, but tapping it expands the card instead of accidentally calling)
             const phoneHtml = member.phone ? `
-                <a href="tel:${member.phone.replace(/\s+/g, '')}" class="member-phone" onclick="event.stopPropagation();">
+                <div class="member-phone">
                     <span>📞</span> ${member.phone}
-                </a>
+                </div>
             ` : '';
 
             // Notes / details preview
@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const badgeClass = (paid >= 3000) ? 'member-paid-badge' : 'member-due-badge';
         modalMemberBadge.innerHTML = `<span class="${badgeClass}">₹${paid.toLocaleString('en-IN')}</span>`;
 
-        // Direct phone call button
+        // Direct phone call button inside the modal
         if (member.phone) {
             const cleanPhone = member.phone.replace(/\s+/g, '');
             modalMemberPhoneBtn.href = `tel:${cleanPhone}`;
