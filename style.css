@@ -243,20 +243,19 @@ a:hover {
     background: #fdfdfd;
 }
 
-/* REDESIGNED MEMBER CARD: Full-Height Photo + Interactive Click */
+/* STYLE A: Framed Badge Card Layout */
 .member-card {
     display: flex;
-    align-items: stretch; /* Photo takes full vertical height */
-    padding: 0; /* Clean flush edge for photo */
+    align-items: center; /* Vertically center badge and info */
+    gap: 14px;
+    padding: 12px 14px;
     background-color: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    border-radius: 10px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     cursor: pointer;
-    overflow: hidden;
     position: relative;
     transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-    min-height: 115px;
 }
 
 .member-card:hover {
@@ -265,19 +264,21 @@ a:hover {
     border-color: #D4AF37;
 }
 
-/* Left Photo Wrap - Expands to entire height */
+/* Locked 1:1 Square Gold-Trimmed Badge */
 .member-photo-left {
-    width: 105px;
-    min-width: 105px;
-    max-width: 105px;
-    align-self: stretch;
-    background-color: #f5f5f5;
+    width: 95px;
+    height: 95px;
+    min-width: 95px;
+    min-height: 95px;
+    border-radius: 8px;
+    border: 2px solid #D4AF37;
+    overflow: hidden;
+    flex-shrink: 0;
+    background-color: #fafafa;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-right: 1px solid #eee;
-    flex-shrink: 0;
-    position: relative;
 }
 
 .member-panel-photo {
@@ -293,16 +294,16 @@ a:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.2rem;
+    font-size: 2.5rem;
     color: #aaa;
-    background-color: #f0f0f0;
+    background-color: #f2f2f2;
 }
 
 .member-info {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 10px 14px;
+    padding: 0;
     overflow: hidden;
     flex-grow: 1;
 }
@@ -342,7 +343,7 @@ a:hover {
     text-decoration: underline;
 }
 
-/* Notes preview in card */
+/* Notes preview in card (No squiggly warning in VS Code) */
 .member-notes {
     font-size: 0.83em;
     color: #666;
@@ -352,7 +353,7 @@ a:hover {
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 2;
-    line-clamp: 2; /* <-- Adding this satisfies VS Code's validator */
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     background-color: #fafafa;
     padding: 3px 6px;
@@ -1118,9 +1119,15 @@ a:hover {
         padding: 10px;
         gap: 10px;
     }
+    .member-card {
+        padding: 10px 12px;
+        gap: 12px;
+    }
     .member-photo-left {
-        width: 95px;
-        min-width: 95px;
+        width: 85px;
+        height: 85px;
+        min-width: 85px;
+        min-height: 85px;
     }
     .member-modal-photo {
         width: 150px;
