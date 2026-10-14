@@ -42,11 +42,11 @@
             background-color: #27ae60;
             color: #ffffff;
             border: none;
-            padding: 8px 14px;
+            padding: 9px 16px;
             cursor: pointer;
             border-radius: 4px;
             font-weight: bold;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -180,10 +180,6 @@
     <div id="dashboard-screen" class="admin-wrapper" style="display: none;">
         <div class="admin-tabs">
             <button class="tab-btn active" onclick="switchTab('members')">Permanent Members</button>
-            <!-- DOWNLOAD BUTTON DIRECTLY BESIDE PERMANENT MEMBERS TAB BUTTON -->
-            <button type="button" class="btn-download-excel" onclick="exportMembersToExcel()" title="Download all member details into an Excel (.xlsx) file">
-                📥 Download Excel
-            </button>
             <button class="tab-btn" onclick="switchTab('contributors')">Contributors</button>
             <button class="tab-btn" onclick="switchTab('events')">Events</button>
             <button class="tab-btn" onclick="switchTab('settings')">Site Settings</button>
@@ -192,10 +188,11 @@
 
         <!-- MEMBERS TAB -->
         <div id="tab-members" class="tab-content active">
+            <!-- SECTION HEADER WITH DOWNLOAD BUTTON -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
                 <h2 style="margin: 0;">Manage Permanent Members</h2>
-                <button type="button" class="btn-download-excel" onclick="exportMembersToExcel()" style="padding: 9px 16px; font-size: 0.9rem;">
-                    📥 Export All to Excel (.xlsx)
+                <button type="button" class="btn-download-excel" onclick="exportMembersToExcel()" title="Download all member details into an Excel (.xlsx) file">
+                    📥 Download Permanent Members
                 </button>
             </div>
             
