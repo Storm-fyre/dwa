@@ -21,7 +21,7 @@
 
     <style>
         .admin-wrapper { max-width: 1050px; margin: 40px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; flex-wrap: wrap; }
+        .admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; flex-wrap: wrap; align-items: center; }
         .tab-btn { padding: 10px 20px; border: none; background: #eee; cursor: pointer; font-weight: bold; border-radius: 4px; }
         .tab-btn.active { background: #800000; color: #D4AF37; }
         .tab-content { display: none; }
@@ -36,6 +36,29 @@
         .btn-edit:hover { background: #d68910; }
         .btn-delete { background: #e74c3c; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; }
         .btn-delete:hover { background: #c0392b; }
+
+        /* Excel Download Button */
+        .btn-download-excel {
+            background-color: #27ae60;
+            color: #ffffff;
+            border: none;
+            padding: 8px 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .btn-download-excel:hover {
+            background-color: #219653;
+            transform: translateY(-1px);
+        }
+        .btn-download-excel:active {
+            transform: translateY(0);
+        }
 
         /* Admin Header */
         .admin-header {
@@ -157,6 +180,10 @@
     <div id="dashboard-screen" class="admin-wrapper" style="display: none;">
         <div class="admin-tabs">
             <button class="tab-btn active" onclick="switchTab('members')">Permanent Members</button>
+            <!-- DOWNLOAD BUTTON DIRECTLY BESIDE PERMANENT MEMBERS TAB BUTTON -->
+            <button type="button" class="btn-download-excel" onclick="exportMembersToExcel()" title="Download all member details into an Excel (.xlsx) file">
+                📥 Download Excel
+            </button>
             <button class="tab-btn" onclick="switchTab('contributors')">Contributors</button>
             <button class="tab-btn" onclick="switchTab('events')">Events</button>
             <button class="tab-btn" onclick="switchTab('settings')">Site Settings</button>
@@ -165,12 +192,17 @@
 
         <!-- MEMBERS TAB -->
         <div id="tab-members" class="tab-content active">
-            <h2>Manage Permanent Members</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                <h2 style="margin: 0;">Manage Permanent Members</h2>
+                <button type="button" class="btn-download-excel" onclick="exportMembersToExcel()" style="padding: 9px 16px; font-size: 0.9rem;">
+                    📥 Export All to Excel (.xlsx)
+                </button>
+            </div>
+            
             <div class="admin-form" style="flex-direction: column;">
                 <div style="display: flex; gap: 10px; flex-wrap: wrap; width: 100%;">
                     <div style="flex: 1; min-width: 140px;">
                         <label style="font-size: 0.85rem; font-weight: bold; color: #555;">Member ID:</label>
-                        <!-- PRE-ENTERED WITH 20230001 BY DEFAULT -->
                         <input type="number" id="new-member-no" value="20230001" style="width: 100%; font-weight: bold; color: #800000;">
                     </div>
                     <div style="flex: 2; min-width: 200px;">
@@ -187,7 +219,7 @@
                     </div>
                 </div>
 
-                <!-- NOTES TEXTAREA (Handles complete sentences comfortably) -->
+                <!-- NOTES TEXTAREA -->
                 <div style="width: 100%;">
                     <label style="font-size: 0.85rem; font-weight: bold; color: #555;">Notes / Details (Job, Native Place, Sentences):</label>
                     <textarea id="new-member-notes" rows="2" placeholder="e.g., Working as Senior Architect at Tech Mahindra. Living in Madinaguda, Hyderabad. Native of Tenali." style="width: 100%; min-height: 60px; resize: vertical;"></textarea>
@@ -332,7 +364,7 @@
         </div>
     </div>
 
-    <!-- 1:1 SQUARE CROPPER MODAL (Layer 10000 - POPS UP ON TOP) -->
+    <!-- 1:1 SQUARE CROPPER MODAL (Layer 10000) -->
     <div id="cropper-modal" class="admin-modal-overlay">
         <div class="modal-box">
             <h3 style="margin: 0; color: #800000;">Crop Photo (Locked 1:1 Square)</h3>
@@ -347,6 +379,8 @@
         </div>
     </div>
 
+    <!-- SheetJS (XLSX) for Native Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- Image Compression & Cropping Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/compressorjs/1.2.1/compressor.min.js"></script>

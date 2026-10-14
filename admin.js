@@ -40,8 +40,11 @@ function showDashboard() {
 window.switchTab = function(tabName) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(`tab-${tabName}`).classList.add('active');
-    if (event && event.target) event.target.classList.add('active');
+    const targetContent = document.getElementById(`tab-${tabName}`);
+    if (targetContent) targetContent.classList.add('active');
+    if (event && event.target && event.target.classList.contains('tab-btn')) {
+        event.target.classList.add('active');
+    }
 };
 
 function loadAllData() {
@@ -85,47 +88,50 @@ const cropperModalImage = document.getElementById('cropper-modal-image');
 const memberPhotoPreviewWrap = document.getElementById('member-photo-preview-wrap');
 const memberPhotoPreview = document.getElementById('member-photo-preview');
 
-chooseMemberPhotoBtn.addEventListener('click', () => {
-    cropTarget = 'new';
-    memberPhotoInput.click();
-});
+if (chooseMemberPhotoBtn) {
+    chooseMemberPhotoBtn.addEventListener('click', () => {
+        cropTarget = 'new';
+        memberPhotoInput.click();
+    });
+}
 
 window.triggerEditPhotoUpload = function() {
     cropTarget = 'edit';
     memberPhotoInput.click();
 };
 
-memberPhotoInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+if (memberPhotoInput) {
+    memberPhotoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-        cropperModalImage.src = event.target.result;
-        cropperModal.style.display = 'flex'; // Pops up in front (z-index: 10000)
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            cropperModalImage.src = event.target.result;
+            cropperModal.style.display = 'flex';
 
-        if (memberCropper) {
-            memberCropper.destroy();
-        }
+            if (memberCropper) {
+                memberCropper.destroy();
+            }
 
-        // Initialize locked 1:1 square cropper
-        memberCropper = new Cropper(cropperModalImage, {
-            aspectRatio: 1,
-            viewMode: 1,
-            dragMode: 'move',
-            autoCropArea: 0.85,
-            restore: false,
-            guides: true,
-            center: true,
-            highlight: false,
-            cropBoxMovable: true,
-            cropBoxResizable: true,
-            toggleDragModeOnDblclick: false,
-        });
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
-});
+            memberCropper = new Cropper(cropperModalImage, {
+                aspectRatio: 1,
+                viewMode: 1,
+                dragMode: 'move',
+                autoCropArea: 0.85,
+                restore: false,
+                guides: true,
+                center: true,
+                highlight: false,
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+                toggleDragModeOnDblclick: false,
+            });
+        };
+        reader.readAsDataURL(file);
+        e.target.value = '';
+    });
+}
 
 window.cancelCrop = function() {
     if (memberCropper) {
@@ -170,7 +176,7 @@ window.applyCrop = function() {
                     }
                 }
                 
-                cancelCrop(); // Closes cropper, revealing Edit window smoothly underneath
+                cancelCrop();
             },
             error(err) {
                 alert("Error optimizing photo: " + err.message);
@@ -187,6 +193,83 @@ window.clearNewMemberPhoto = function() {
 };
 
 // ==========================================
+// --- EXCEL (.XLSX) EXPORT FUNCTIONALITY ---
+// ==========================================
+window.exportMembersToExcel = async function() {
+    try {
+        let membersToExport = loadedMembersList;
+
+        // Fetch fresh if empty
+        if (!membersToExport || membersToExport.length === 0) {
+            const res = await fetch('/api/members');
+            if (res.ok) {
+                membersToExport = await res.json();
+            }
+        }
+
+        if (!membersToExport || membersToExport.length === 0) {
+            alert("No members found to export.");
+            return;
+        }
+
+        // Sort by Member ID strictly ascending
+        const sorted = [...membersToExport].sort((a, b) => {
+            return (parseInt(a.membership_no, 10) || 0) - (parseInt(b.membership_no, 10) || 0);
+        });
+
+        // Format data into clean spreadsheet columns
+        const excelData = sorted.map((m, index) => {
+            const paid = parseInt(m.paid_amount, 10) || 0;
+            const due = m.due_amount !== undefined ? parseInt(m.due_amount, 10) : Math.max(0, 3000 - paid);
+            const status = paid >= 3000 ? "Fully Paid" : "Due Pending";
+
+            return {
+                "S.No": index + 1,
+                "Member ID": m.membership_no || "",
+                "Full Name": m.name || "",
+                "Phone Number": m.phone || "",
+                "Notes / Profile Details": m.notes || "",
+                "Amount Paid (₹)": paid,
+                "Amount Due (₹)": due,
+                "Payment Status": status,
+                "Photo URL": m.photo_url || "",
+                "Registration Date": m.created_at || ""
+            };
+        });
+
+        // Create workbook using SheetJS
+        const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+        // Adjust column widths for clean readability
+        worksheet["!cols"] = [
+            { wch: 6 },   // S.No
+            { wch: 14 },  // Member ID
+            { wch: 28 },  // Full Name (handles Telugu script smoothly)
+            { wch: 16 },  // Phone Number
+            { wch: 50 },  // Notes / Profile Details
+            { wch: 16 },  // Amount Paid (₹)
+            { wch: 16 },  // Amount Due (₹)
+            { wch: 15 },  // Payment Status
+            { wch: 45 },  // Photo URL
+            { wch: 22 }   // Registration Date
+        ];
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Permanent Members");
+
+        // Generate filename with date
+        const today = new Date().toISOString().split('T')[0];
+        const fileName = `DWA_Permanent_Members_${today}.xlsx`;
+
+        // Trigger instant browser download
+        XLSX.writeFile(workbook, fileName);
+    } catch (error) {
+        console.error("Export error:", error);
+        alert("Failed to export Excel file: " + error.message);
+    }
+};
+
+// ==========================================
 // --- Members CRUD (Add, Edit, Delete) ---
 // ==========================================
 async function loadMembers() {
@@ -195,7 +278,6 @@ async function loadMembers() {
         const data = await res.json();
         loadedMembersList = Array.isArray(data) ? data : [];
 
-        // Pre-fill input with +1 of highest ID (starts at 20230001)
         updateNextMemberNo();
 
         const tbody = document.getElementById('members-list');
@@ -206,7 +288,6 @@ async function loadMembers() {
             
             const paidAmount = parseInt(m.paid_amount, 10) || 0;
 
-            // Payment status badge: Green if >= 3000, Red if < 3000
             const paymentBadge = (paidAmount >= 3000)
                 ? `<span style="color: #27ae60; background: #eafaf1; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">₹${paidAmount.toLocaleString('en-IN')}</span>`
                 : `<span style="color: #c0392b; background: #fde8e8; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">₹${paidAmount.toLocaleString('en-IN')}</span>`;
@@ -301,7 +382,6 @@ window.addMember = async function() {
     btn.disabled = false;
     status.style.display = 'none';
 
-    // Reload list and automatically set next ID (+1) in the box
     await loadMembers();
 };
 
